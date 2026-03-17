@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__execute_sql",
+      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__apply_migration",
+      "Read(//c/Users/natha/**)",
+      "Read(//c/Users/natha/AppData/Roaming/Claude/**)",
+      "Bash(xargs grep:*)",
+      "Bash(supabase --version)",
+      "Bash(find /c/Users/natha/scoop -name supabase*)",
+      "Bash(head -5 find /c/Users/natha/AppData -name supabase*)",
+      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__list_tables"
+    ]
+  }
+}
