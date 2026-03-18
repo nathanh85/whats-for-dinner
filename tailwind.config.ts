@@ -9,21 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50:  '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+        cream: '#F9F5EE',
+        ink:   '#1C1A17',
+        olive: {
+          DEFAULT: '#5C6B3A',
+          dark:    '#4a5730',
+          light:   '#7a8f4e',
+        },
+        rust: {
+          DEFAULT: '#C4612A',
+          dark:    '#a84f22',
+          light:   '#d97748',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['DM Sans', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
       },
     },
   },

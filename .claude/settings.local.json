@@ -10,7 +10,16 @@
       "Bash(supabase --version)",
       "Bash(find /c/Users/natha/scoop -name supabase*)",
       "Bash(head -5 find /c/Users/natha/AppData -name supabase*)",
-      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__list_tables"
+      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__list_tables",
+      "Bash(gh pr:*)",
+      "Bash(powershell.exe -Command \"Get-Command node, npm, gh, supabase -ErrorAction SilentlyContinue | Select-Object Name, Source\")",
+      "Bash(powershell.exe -Command \"\\(Get-Command node -ErrorAction SilentlyContinue\\).Source; \\(Get-Command npm -ErrorAction SilentlyContinue\\).Source; \\(Get-Command gh -ErrorAction SilentlyContinue\\).Source; \\(Get-Command supabase -ErrorAction SilentlyContinue\\).Source\")",
+      "Bash(tr ';' '\\\\n')",
+      "Bash(npm --version)",
+      "Bash(gh --version)",
+      "Bash(git --version)",
+      "Bash(git remote:*)",
+      "Bash(git add:*)"
     ]
   }
 }
