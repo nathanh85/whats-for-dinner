@@ -29,7 +29,8 @@
       "Bash(\"C:/Program Files/nodejs/node.exe\" \"C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js\" install)",
       "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
       "Bash(echo $PATH)",
-      "Bash(source ~/.bashrc)"
+      "Bash(source ~/.bashrc)",
+      "Bash(git rm:*)"
     ]
   }
 }
