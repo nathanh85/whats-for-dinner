@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { CalendarDays, BookOpen, Package, ShoppingCart } from 'lucide-react'
+import type { Profile } from '@/types/database'
 
 const quickLinks = [
   {
@@ -47,12 +48,13 @@ export default async function DashboardPage() {
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
   // Get household_id from profile
-  const { data: profile } = await supabase
+  const { data: profileData } = await supabase
     .from('profiles')
-    .select('household_id')
+    .select('*')
     .eq('id', user!.id)
     .single()
 
+  const profile = profileData as Profile | null
   const householdId = profile?.household_id
 
   // Fetch all stats in parallel

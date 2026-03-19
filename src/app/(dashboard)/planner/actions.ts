@@ -23,7 +23,7 @@ export async function addMeal(formData: FormData) {
 
   const { error } = await supabase.from('meal_plans').insert({
     household_id: householdId,
-    date,
+    planned_for: date,
     meal_type: mealType,
     recipe_id: recipeId || null,
     custom_meal_name: recipeId ? null : customName,

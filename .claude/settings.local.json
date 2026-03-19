@@ -30,7 +30,14 @@
       "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
       "Bash(echo $PATH)",
       "Bash(source ~/.bashrc)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(ls -la \"/c/Users/natha/OneDrive/Documents/whats-for-dinner/src/app/\\(dashboard\\)/recipes/\")",
+      "mcp__6d8b19ba-e57b-4262-a6dd-4b4c2c03745a__deploy_to_vercel",
+      "Bash(npx vercel:*)",
+      "mcp__6d8b19ba-e57b-4262-a6dd-4b4c2c03745a__list_teams",
+      "mcp__6d8b19ba-e57b-4262-a6dd-4b4c2c03745a__get_deployment_build_logs",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

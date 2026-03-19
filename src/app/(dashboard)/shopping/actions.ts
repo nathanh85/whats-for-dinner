@@ -118,14 +118,14 @@ export async function generateFromMealPlan(householdId: string) {
     .from('meal_plans')
     .select('recipe_id, servings')
     .eq('household_id', householdId)
-    .gte('date', start)
-    .lte('date', end)
+    .gte('planned_for', start)
+    .lte('planned_for', end)
     .not('recipe_id', 'is', null)
 
   if (plansError) return { error: plansError.message }
   if (!plans || plans.length === 0) return { error: 'No recipes planned this week' }
 
-  const recipeIds = [...new Set(plans.map(p => p.recipe_id!))]
+  const recipeIds = Array.from(new Set(plans.map(p => p.recipe_id!)))
 
   // Get all ingredients for those recipes
   const { data: ingredients, error: ingError } = await supabase

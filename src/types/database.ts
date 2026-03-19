@@ -25,10 +25,9 @@ export interface Database {
           name?: string
           created_at?: string
         }
+        Relationships: []
       }
       profiles: {
-        // id = auth.uid() (set by trigger on signup).
-        // user_id is a separate nullable FK, used for managed/non-auth members.
         Row: {
           id: string
           user_id: string | null
@@ -59,6 +58,7 @@ export interface Database {
           is_managed?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       household_members: {
         Row: {
@@ -82,6 +82,7 @@ export interface Database {
           role?: 'admin' | 'member'
           joined_at?: string
         }
+        Relationships: []
       }
       recipes: {
         Row: {
@@ -126,6 +127,7 @@ export interface Database {
           is_public?: boolean
           created_at?: string
         }
+        Relationships: []
       }
       recipe_ingredients: {
         Row: {
@@ -149,6 +151,7 @@ export interface Database {
           quantity?: number | null
           unit?: string | null
         }
+        Relationships: []
       }
       recipe_interactions: {
         Row: {
@@ -178,6 +181,7 @@ export interface Database {
           cooked_at?: string | null
           notes?: string | null
         }
+        Relationships: []
       }
       pantry_items: {
         Row: {
@@ -213,12 +217,13 @@ export interface Database {
           low_stock_threshold?: number
           updated_at?: string
         }
+        Relationships: []
       }
       meal_plans: {
         Row: {
           id: string
           household_id: string | null
-          date: string
+          planned_for: string
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id: string | null
           custom_meal_name: string | null
@@ -229,7 +234,7 @@ export interface Database {
         Insert: {
           id?: string
           household_id?: string | null
-          date: string
+          planned_for: string
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id?: string | null
           custom_meal_name?: string | null
@@ -240,7 +245,7 @@ export interface Database {
         Update: {
           id?: string
           household_id?: string | null
-          date?: string
+          planned_for?: string
           meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id?: string | null
           custom_meal_name?: string | null
@@ -248,6 +253,7 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       shopping_items: {
         Row: {
@@ -258,7 +264,7 @@ export interface Database {
           unit: string | null
           category: string | null
           is_checked: boolean
-          added_by: string | null  // FK → profiles.id
+          added_by: string | null
           source: 'manual' | 'meal_plan' | 'recommendation'
           created_at: string
         }
@@ -286,16 +292,27 @@ export interface Database {
           source?: 'manual' | 'meal_plan' | 'recommendation'
           created_at?: string
         }
+        Relationships: []
       }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      create_household: {
+        Args: { household_name: string }
+        Returns: string
+      }
+      get_my_household_ids: {
+        Args: Record<string, never>
+        Returns: string[]
+      }
+    }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
       member_role: 'admin' | 'member'
       recipe_source: 'seeded' | 'user' | 'ai'
       shopping_source: 'manual' | 'meal_plan' | 'recommendation'
     }
+    CompositeTypes: Record<string, never>
   }
 }
 

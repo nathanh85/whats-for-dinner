@@ -16,7 +16,7 @@ export default async function HouseholdPage() {
     .eq('id', user!.id)
     .maybeSingle()
 
-  const household = profile?.households as { id: string; name: string } | null
+  const household = profile?.households as unknown as { id: string; name: string } | null
 
   // If they're in a household, load all members with their profiles
   const members = household
@@ -74,7 +74,7 @@ export default async function HouseholdPage() {
 
             <ul className="divide-y divide-stone-100">
               {members.map((member) => {
-                const memberProfile = member.profiles as
+                const memberProfile = member.profiles as unknown as
                   | { id: string; display_name: string; avatar_color: string }
                   | null
                 const isYou = member.user_id === user!.id
