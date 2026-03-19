@@ -11,32 +11,17 @@ export async function createHousehold(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  // 1. Create the household
-  const { data: household, error: householdError } = await supabase
-    .from('households')
-    .insert({ name })
-    .select('id')
-    .single()
+  // Use SECURITY DEFINER function — handles all 3 steps in one transaction,
+  // bypassing RLS which would block the household SELECT before household_members exists
+  const { data, error } = await supabase.rpc('create_household', {
+    household_name: name,
+  })
 
-  if (householdError) return { error: householdError.message }
-
-  // 2. Add the creator as admin member
-  const { error: memberError } = await supabase
-    .from('household_members')
-    .insert({ household_id: household.id, user_id: user.id, role: 'admin' })
-
-  if (memberError) return { error: memberError.message }
-
-  // 3. Link the profile to the household
-  const { error: profileError } = await supabase
-    .from('profiles')
-    .update({ household_id: household.id })
-    .eq('id', user.id)
-
-  if (profileError) return { error: profileError.message }
+  if (error) return { error: error.message }
 
   revalidatePath('/household')
-  return { success: true }
+  revalidatePath('/dashboard')
+  return { success: true, household: data }
 }
 
 export async function renameHousehold(formData: FormData) {

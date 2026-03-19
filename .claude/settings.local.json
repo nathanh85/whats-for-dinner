@@ -19,7 +19,17 @@
       "Bash(gh --version)",
       "Bash(git --version)",
       "Bash(git remote:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout:*)",
+      "Bash(git push:*)",
+      "mcp__d0e37b04-1a28-438d-b195-44a287331a96__list_migrations",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npm:*)",
+      "Bash(\"C:/Program Files/nodejs/node.exe\" \"C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js\" install)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/nodejs\")",
+      "Bash(echo $PATH)",
+      "Bash(source ~/.bashrc)"
     ]
   }
 }
