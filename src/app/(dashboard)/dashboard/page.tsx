@@ -65,7 +65,9 @@ export default async function DashboardPage() {
           .gte('planned_for', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
           .lte('planned_for', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
       : Promise.resolve({ count: 0 }),
-    supabase.from('recipes').select('id', { count: 'exact', head: true }),
+    supabase.from('recipe_interactions').select('id', { count: 'exact', head: true })
+      .eq('user_id', user!.id)
+      .eq('is_saved', true),
     householdId
       ? supabase.from('pantry_items').select('id', { count: 'exact', head: true }).eq('household_id', householdId)
       : Promise.resolve({ count: 0 }),

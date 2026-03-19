@@ -27,7 +27,17 @@ export default async function HouseholdPage() {
         .then(({ data }) => data ?? [])
     : []
 
-  const currentMember = members.find((m) => m.user_id === user!.id)
+  // Query current user's role directly (more reliable than find on joined data)
+  const { data: myMembership } = household
+    ? await supabase
+        .from('household_members')
+        .select('role')
+        .eq('household_id', household.id)
+        .eq('user_id', user!.id)
+        .maybeSingle()
+    : { data: null }
+
+  const currentMember = myMembership ?? members.find((m) => m.user_id === user!.id)
 
   return (
     <div className="mx-auto max-w-3xl">
