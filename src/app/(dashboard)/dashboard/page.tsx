@@ -46,6 +46,41 @@ export default async function DashboardPage() {
   const greeting =
     hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
+  // Get household_id from profile
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('household_id')
+    .eq('id', user!.id)
+    .single()
+
+  const householdId = profile?.household_id
+
+  // Fetch all stats in parallel
+  const [mealsRes, recipesRes, pantryRes, shoppingRes] = await Promise.all([
+    householdId
+      ? supabase.from('meal_plans').select('id', { count: 'exact', head: true })
+          .eq('household_id', householdId)
+          .gte('planned_for', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .lte('planned_for', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+      : Promise.resolve({ count: 0 }),
+    supabase.from('recipes').select('id', { count: 'exact', head: true }),
+    householdId
+      ? supabase.from('pantry_items').select('id', { count: 'exact', head: true }).eq('household_id', householdId)
+      : Promise.resolve({ count: 0 }),
+    householdId
+      ? supabase.from('shopping_items').select('id', { count: 'exact', head: true })
+          .eq('household_id', householdId)
+          .eq('is_checked', false)
+      : Promise.resolve({ count: 0 }),
+  ])
+
+  const stats = [
+    { label: 'Meals this week', value: mealsRes.count ?? 0 },
+    { label: 'Recipes saved', value: recipesRes.count ?? 0 },
+    { label: 'Pantry items', value: pantryRes.count ?? 0 },
+    { label: 'Left to buy', value: shoppingRes.count ?? 0 },
+  ]
+
   return (
     <div className="mx-auto max-w-4xl">
       {/* Greeting */}
@@ -86,12 +121,7 @@ export default async function DashboardPage() {
           At a glance
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {[
-            { label: 'Meals planned', value: '—' },
-            { label: 'Recipes saved', value: '—' },
-            { label: 'Pantry items', value: '—' },
-            { label: 'Shopping items', value: '—' },
-          ].map(({ label, value }) => (
+          {stats.map(({ label, value }) => (
             <div key={label} className="card text-center">
               <p className="text-3xl font-bold text-stone-900">{value}</p>
               <p className="mt-1 text-xs text-stone-500">{label}</p>
