@@ -67,10 +67,10 @@ export default async function PlannerPage({
   const { data: mealPlans } = profile?.household_id
     ? await supabase
         .from('meal_plans')
-        .select('id, planned_for, meal_type, custom_meal_name, servings, notes, recipe_id, recipes(title)')
+        .select('id, date, meal_type, custom_meal_name, servings, notes, recipe_id, recipes(title)')
         .eq('household_id', profile.household_id)
-        .gte('planned_for', weekStartStr)
-        .lte('planned_for', weekEndStr)
+        .gte('date', weekStartStr)
+        .lte('date', weekEndStr)
         .order('meal_type')
     : { data: [] }
 

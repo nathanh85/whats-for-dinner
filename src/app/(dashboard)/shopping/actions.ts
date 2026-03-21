@@ -118,8 +118,8 @@ export async function generateFromMealPlan(householdId: string) {
     .from('meal_plans')
     .select('recipe_id, servings')
     .eq('household_id', householdId)
-    .gte('planned_for', start)
-    .lte('planned_for', end)
+    .gte('date', start)
+    .lte('date', end)
     .not('recipe_id', 'is', null)
 
   if (plansError) return { error: plansError.message }

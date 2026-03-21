@@ -14,13 +14,13 @@ type Day = {
 
 type MealPlan = {
   id: string
-  planned_for: string
+  date: string
   meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
   custom_meal_name: string | null
   servings: number
   notes: string | null
   recipe_id: string | null
-  recipes: { title: string }[] | null
+  recipes: { title: string } | null
 }
 
 type Recipe = {
@@ -73,11 +73,11 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
   const [, startTransition] = useTransition()
 
   function getMealsForDay(date: string, mealType: string) {
-    return mealPlans.filter(m => m.planned_for === date && m.meal_type === mealType)
+    return mealPlans.filter(m => m.date === date && m.meal_type === mealType)
   }
 
   function getMealName(meal: MealPlan) {
-    return meal.recipes?.[0]?.title ?? meal.custom_meal_name ?? 'Unnamed meal'
+    return meal.recipes?.title ?? meal.custom_meal_name ?? 'Unnamed meal'
   }
 
   function handleRemove(id: string) {
