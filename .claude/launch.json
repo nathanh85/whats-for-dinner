@@ -7,7 +7,8 @@
       "runtimeArgs": ["C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js", "run", "dev"],
       "port": 3000,
       "env": {
-        "PATH": "C:\\Program Files\\nodejs;C:\\Windows\\system32;C:\\Windows"
+        "PATH": "C:\\Program Files\\nodejs;C:\\Windows\\system32;C:\\Windows",
+        "NODE_PATH": "C:\\Users\\natha\\OneDrive\\Documents\\whats-for-dinner\\node_modules"
       }
     }
   ]

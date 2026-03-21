@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Plus, X, Loader2 } from 'lucide-react'
 import { removeMeal } from '@/app/(dashboard)/planner/actions'
-import AddMealModal from './AddMealModal'
+import AddMealModal, { type ExistingMeal } from './AddMealModal'
 
 type Day = {
   date: string
@@ -55,7 +55,11 @@ const MEAL_DOT: Record<string, string> = {
 }
 
 export default function WeekGrid({ days, mealPlans, recipes, householdId, today }: Props) {
-  const [addingTo, setAddingTo] = useState<{ date: string; mealType: string } | null>(null)
+  const [modalState, setModalState] = useState<{
+    date: string
+    mealType: string
+    existingMeal?: ExistingMeal
+  } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -131,9 +135,22 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                           key={meal.id}
                           className={`mb-1 flex items-start justify-between gap-1 rounded-lg border px-2 py-1.5 text-xs ${MEAL_COLORS[mealType]}`}
                         >
-                          <span className="min-w-0 flex-1 truncate font-medium leading-tight">
+                          <button
+                            onClick={() => setModalState({
+                              date: day.date,
+                              mealType,
+                              existingMeal: {
+                                id: meal.id,
+                                recipe_id: meal.recipe_id,
+                                custom_meal_name: meal.custom_meal_name,
+                                servings: meal.servings,
+                                notes: meal.notes,
+                              },
+                            })}
+                            className="min-w-0 flex-1 truncate text-left font-medium leading-tight hover:underline"
+                          >
                             {getMealName(meal)}
-                          </span>
+                          </button>
                           <button
                             onClick={() => handleRemove(meal.id)}
                             disabled={removingId === meal.id}
@@ -151,7 +168,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                       {/* Add button — always visible on today, hover on others */}
                       {householdId && (
                         <button
-                          onClick={() => setAddingTo({ date: day.date, mealType })}
+                          onClick={() => setModalState({ date: day.date, mealType })}
                           className={`flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-[10px] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 ${
                             isToday ? 'opacity-100' : 'opacity-0 group-hover/slot:opacity-100'
                           }`}
@@ -181,14 +198,15 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
         </div>
       )}
 
-      {/* Add meal modal */}
-      {addingTo && (
+      {/* Add / Edit meal modal */}
+      {modalState && (
         <AddMealModal
-          date={addingTo.date}
-          mealType={addingTo.mealType}
+          date={modalState.date}
+          mealType={modalState.mealType}
           householdId={householdId!}
           recipes={recipes}
-          onClose={() => setAddingTo(null)}
+          existingMeal={modalState.existingMeal}
+          onClose={() => setModalState(null)}
         />
       )}
     </>

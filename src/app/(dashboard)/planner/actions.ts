@@ -37,6 +37,34 @@ export async function addMeal(formData: FormData) {
   return { success: true }
 }
 
+export async function updateMeal(mealPlanId: string, formData: FormData) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const recipeId = formData.get('recipe_id') as string | null
+  const customName = (formData.get('custom_meal_name') as string)?.trim() || null
+  const servings = Number(formData.get('servings') ?? 4)
+  const notes = (formData.get('notes') as string)?.trim() || null
+
+  if (!recipeId && !customName) return { error: 'Choose a recipe or enter a meal name' }
+
+  const { error } = await supabase
+    .from('meal_plans')
+    .update({
+      recipe_id: recipeId || null,
+      custom_meal_name: recipeId ? null : customName,
+      servings,
+      notes,
+    })
+    .eq('id', mealPlanId)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/planner')
+  return { success: true }
+}
+
 export async function removeMeal(mealPlanId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

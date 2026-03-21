@@ -3,12 +3,10 @@ import { redirect } from 'next/navigation'
 import { CalendarDays } from 'lucide-react'
 import WeekGrid from '@/components/planner/WeekGrid'
 
-// Return the Monday of the week containing `date`
+// Return the Sunday of the week containing `date`
 function getWeekStart(date: Date): Date {
   const d = new Date(date)
-  const day = d.getDay() // 0=Sun
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-  d.setDate(diff)
+  d.setDate(d.getDate() - d.getDay()) // getDay() 0=Sun, subtract to reach Sunday
   d.setHours(0, 0, 0, 0)
   return d
 }
@@ -20,7 +18,10 @@ function addDays(date: Date, n: number): Date {
 }
 
 function toDateString(date: Date): string {
-  return date.toISOString().split('T')[0]
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 export default async function PlannerPage({

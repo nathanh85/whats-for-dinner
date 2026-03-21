@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { X, Loader2, ChefHat, PenLine } from 'lucide-react'
-import { addMeal } from '@/app/(dashboard)/planner/actions'
+import { addMeal, updateMeal } from '@/app/(dashboard)/planner/actions'
 
 type Recipe = {
   id: string
@@ -11,11 +11,20 @@ type Recipe = {
   cook_time: number | null
 }
 
+export type ExistingMeal = {
+  id: string
+  recipe_id: string | null
+  custom_meal_name: string | null
+  servings: number
+  notes: string | null
+}
+
 type Props = {
   date: string
   mealType: string
   householdId: string
   recipes: Recipe[]
+  existingMeal?: ExistingMeal
   onClose: () => void
 }
 
@@ -26,10 +35,17 @@ const MEAL_TYPE_LABELS: Record<string, string> = {
   snack: 'Snack',
 }
 
-export default function AddMealModal({ date, mealType, householdId, recipes, onClose }: Props) {
-  const [mode, setMode] = useState<'recipe' | 'custom'>('recipe')
+export default function AddMealModal({ date, mealType, householdId, recipes, existingMeal, onClose }: Props) {
+  const isEditing = !!existingMeal
+
+  const initialMode = existingMeal?.recipe_id ? 'recipe' : 'custom'
+  const initialRecipe = existingMeal?.recipe_id
+    ? recipes.find(r => r.id === existingMeal.recipe_id) ?? null
+    : null
+
+  const [mode, setMode] = useState<'recipe' | 'custom'>(initialMode)
   const [search, setSearch] = useState('')
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(initialRecipe)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const formRef = useRef<HTMLFormElement>(null)
@@ -48,7 +64,9 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
     const formData = new FormData(e.currentTarget)
 
     startTransition(async () => {
-      const result = await addMeal(formData)
+      const result = isEditing
+        ? await updateMeal(existingMeal.id, formData)
+        : await addMeal(formData)
       if (result.error) {
         setError(result.error)
       } else {
@@ -68,7 +86,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
         <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4">
           <div>
             <h2 className="text-base font-semibold text-stone-900">
-              Add {MEAL_TYPE_LABELS[mealType] ?? mealType}
+              {isEditing ? 'Edit' : 'Add'} {MEAL_TYPE_LABELS[mealType] ?? mealType}
             </h2>
             <p className="text-xs text-stone-400">{displayDate}</p>
           </div>
@@ -126,7 +144,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 className="input"
-                autoFocus
+                autoFocus={!isEditing}
               />
 
               {/* Recipe list */}
@@ -177,8 +195,9 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
                   name="custom_meal_name"
                   type="text"
                   placeholder="e.g. Leftover pizza, Takeout Thai…"
+                  defaultValue={existingMeal?.custom_meal_name ?? ''}
                   className="input"
-                  autoFocus
+                  autoFocus={!isEditing || mode === 'custom'}
                   required
                 />
               </div>
@@ -196,8 +215,23 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
               type="number"
               min={1}
               max={20}
-              defaultValue={4}
+              defaultValue={existingMeal?.servings ?? 4}
               className="input w-24"
+            />
+          </div>
+
+          {/* Notes */}
+          <div className="mt-4">
+            <label htmlFor="notes" className="mb-1.5 block text-sm font-medium text-stone-700">
+              Notes <span className="font-normal text-stone-400">(optional)</span>
+            </label>
+            <input
+              id="notes"
+              name="notes"
+              type="text"
+              placeholder="e.g. Double the sauce, use chicken thighs…"
+              defaultValue={existingMeal?.notes ?? ''}
+              className="input"
             />
           </div>
 
@@ -216,7 +250,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, onC
               className="btn-primary"
             >
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Add meal
+              {isEditing ? 'Save changes' : 'Add meal'}
             </button>
           </div>
         </form>
