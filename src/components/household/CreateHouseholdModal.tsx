@@ -34,7 +34,7 @@ export default function CreateHouseholdModal() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end md:items-center md:p-4">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -42,12 +42,12 @@ export default function CreateHouseholdModal() {
           />
 
           {/* Dialog */}
-          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="relative w-full rounded-t-2xl bg-white p-6 shadow-xl md:max-w-md md:rounded-2xl">
             <div className="mb-5 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-stone-900">Create a household</h2>
               <button
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600"
               >
                 <X className="h-5 w-5" />
               </button>

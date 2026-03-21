@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, X, Loader2 } from 'lucide-react'
+import { Plus, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { removeMeal } from '@/app/(dashboard)/planner/actions'
 import AddMealModal, { type ExistingMeal } from './AddMealModal'
 
@@ -54,14 +54,23 @@ const MEAL_DOT: Record<string, string> = {
   snack:     'bg-stone-300',
 }
 
+const MEAL_LABEL_COLOR: Record<string, string> = {
+  breakfast: 'text-amber-600',
+  lunch:     'text-sky-600',
+  dinner:    'text-brand-600',
+  snack:     'text-stone-500',
+}
+
 export default function WeekGrid({ days, mealPlans, recipes, householdId, today }: Props) {
+  const todayIdx = days.findIndex(d => d.date === today)
+  const [selectedDayIdx, setSelectedDayIdx] = useState(todayIdx >= 0 ? todayIdx : 0)
   const [modalState, setModalState] = useState<{
     date: string
     mealType: string
     existingMeal?: ExistingMeal
   } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   function getMealsForDay(date: string, mealType: string) {
     return mealPlans.filter(m => m.planned_for === date && m.meal_type === mealType)
@@ -79,8 +88,144 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
     })
   }
 
-  return (
-    <>
+  function openEditModal(meal: MealPlan, date: string, mealType: string) {
+    setModalState({
+      date,
+      mealType,
+      existingMeal: {
+        id: meal.id,
+        recipe_id: meal.recipe_id,
+        custom_meal_name: meal.custom_meal_name,
+        servings: meal.servings,
+        notes: meal.notes,
+      },
+    })
+  }
+
+  // ── Mobile: single-day view ─────────────────────────────────────────
+  const selectedDay = days[selectedDayIdx]
+
+  const MobileDayView = () => (
+    <div className="md:hidden">
+      {/* Week strip */}
+      <div className="mb-4 flex items-center gap-1">
+        <button
+          onClick={() => setSelectedDayIdx(i => Math.max(0, i - 1))}
+          disabled={selectedDayIdx === 0}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30"
+          aria-label="Previous day"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+
+        <div className="flex flex-1 gap-1">
+          {days.map((day, idx) => {
+            const isSelected = idx === selectedDayIdx
+            const isToday = day.date === today
+            return (
+              <button
+                key={day.date}
+                onClick={() => setSelectedDayIdx(idx)}
+                className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-center transition-colors ${
+                  isSelected
+                    ? 'bg-brand-500 text-white'
+                    : isToday
+                    ? 'bg-brand-50 text-brand-600'
+                    : 'text-stone-500 hover:bg-stone-100'
+                }`}
+              >
+                <span className="text-[10px] font-medium">{day.label[0]}</span>
+                <span className="text-sm font-semibold leading-tight">{day.dayNum}</span>
+              </button>
+            )
+          })}
+        </div>
+
+        <button
+          onClick={() => setSelectedDayIdx(i => Math.min(days.length - 1, i + 1))}
+          disabled={selectedDayIdx === days.length - 1}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30"
+          aria-label="Next day"
+        >
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Day heading */}
+      <div className="mb-4 flex items-center gap-2">
+        <h2 className="text-lg font-semibold text-stone-900">
+          {new Date(selectedDay.date + 'T00:00:00').toLocaleDateString('en-US', {
+            weekday: 'long', month: 'short', day: 'numeric',
+          })}
+        </h2>
+        {selectedDay.date === today && (
+          <span className="rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-medium text-white">
+            today
+          </span>
+        )}
+      </div>
+
+      {/* Meal slots */}
+      <div className="space-y-3">
+        {MEAL_TYPES.map((mealType) => {
+          const meals = getMealsForDay(selectedDay.date, mealType)
+          return (
+            <div key={mealType} className="rounded-xl border border-stone-100 bg-white p-3">
+              <p className={`mb-2 text-xs font-semibold uppercase tracking-wider ${MEAL_LABEL_COLOR[mealType]}`}>
+                <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${MEAL_DOT[mealType]}`} />
+                {mealType}
+              </p>
+
+              {meals.map((meal) => (
+                <div
+                  key={meal.id}
+                  className={`mb-2 flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 ${MEAL_COLORS[mealType]}`}
+                >
+                  <button
+                    onClick={() => openEditModal(meal, selectedDay.date, mealType)}
+                    className="min-w-0 flex-1 text-left text-sm font-medium leading-tight hover:underline"
+                  >
+                    {getMealName(meal)}
+                  </button>
+                  <button
+                    onClick={() => handleRemove(meal.id)}
+                    disabled={removingId === meal.id}
+                    className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-lg hover:bg-black/10 disabled:opacity-40"
+                    aria-label="Remove meal"
+                  >
+                    {removingId === meal.id
+                      ? <Loader2 className="h-4 w-4 animate-spin" />
+                      : <X className="h-4 w-4" />
+                    }
+                  </button>
+                </div>
+              ))}
+
+              {householdId && (
+                <button
+                  onClick={() => setModalState({ date: selectedDay.date, mealType })}
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-lg border-2 border-dashed border-stone-200 px-3 text-sm text-stone-400 transition-colors hover:border-brand-300 hover:text-brand-500"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add {mealType}
+                </button>
+              )}
+            </div>
+          )
+        })}
+      </div>
+
+      {mealPlans.length === 0 && (
+        <p className="mt-4 text-center text-sm text-stone-400">
+          {householdId ? 'Tap a meal slot to get started' : 'Set up a household first'}
+        </p>
+      )}
+    </div>
+  )
+
+  // ── Desktop: 7-column grid ──────────────────────────────────────────
+  const DesktopGrid = () => (
+    <div className="hidden md:block">
       {/* Legend */}
       <div className="mb-4 flex items-center gap-4 text-xs text-stone-500">
         {MEAL_TYPES.map(type => (
@@ -136,17 +281,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                           className={`mb-1 flex items-start justify-between gap-1 rounded-lg border px-2 py-1.5 text-xs ${MEAL_COLORS[mealType]}`}
                         >
                           <button
-                            onClick={() => setModalState({
-                              date: day.date,
-                              mealType,
-                              existingMeal: {
-                                id: meal.id,
-                                recipe_id: meal.recipe_id,
-                                custom_meal_name: meal.custom_meal_name,
-                                servings: meal.servings,
-                                notes: meal.notes,
-                              },
-                            })}
+                            onClick={() => openEditModal(meal, day.date, mealType)}
                             className="min-w-0 flex-1 truncate text-left font-medium leading-tight hover:underline"
                           >
                             {getMealName(meal)}
@@ -165,7 +300,6 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                         </div>
                       ))}
 
-                      {/* Add button — always visible on today, hover on others */}
                       {householdId && (
                         <button
                           onClick={() => setModalState({ date: day.date, mealType })}
@@ -186,7 +320,6 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
         })}
       </div>
 
-      {/* Empty state */}
       {mealPlans.length === 0 && (
         <div className="mt-6 rounded-xl border border-dashed border-stone-300 py-12 text-center">
           <p className="text-sm font-medium text-stone-500">No meals planned this week</p>
@@ -197,6 +330,13 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
           </p>
         </div>
       )}
+    </div>
+  )
+
+  return (
+    <>
+      <MobileDayView />
+      <DesktopGrid />
 
       {/* Add / Edit meal modal */}
       {modalState && (

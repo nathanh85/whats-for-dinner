@@ -34,18 +34,18 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end md:items-center md:p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Dialog */}
-      <div className="relative w-full max-w-md rounded-2xl bg-white shadow-xl">
+      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl md:max-h-none md:max-w-md md:rounded-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4">
           <h2 className="text-base font-semibold text-stone-900">Add pantry item</h2>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600"
           >
             <X className="h-4 w-4" />
           </button>
