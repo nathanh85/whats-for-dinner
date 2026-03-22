@@ -81,18 +81,18 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
       {/* Dialog */}
-      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl md:max-h-none md:max-w-md md:rounded-2xl">
+      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl md:max-h-none md:max-w-md md:rounded-2xl dark:bg-surface-raised">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4 dark:border-surface-border">
           <div>
-            <h2 className="text-base font-semibold text-stone-900">
+            <h2 className="text-base font-semibold text-stone-900 dark:text-dt-primary">
               {isEditing ? 'Edit' : 'Add'} {MEAL_TYPE_LABELS[mealType] ?? mealType}
             </h2>
-            <p className="text-xs text-stone-400">{displayDate}</p>
+            <p className="text-xs text-stone-400 dark:text-dt-muted">{displayDate}</p>
           </div>
           <button
             onClick={onClose}
-            className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+            className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-primary"
           >
             <X className="h-4 w-4" />
           </button>
@@ -108,14 +108,14 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
           )}
 
           {/* Mode toggle */}
-          <div className="mb-5 flex rounded-lg border border-stone-200 p-1">
+          <div className="mb-5 flex rounded-lg border border-stone-200 p-1 dark:border-surface-border">
             <button
               type="button"
               onClick={() => { setMode('recipe'); setSelectedRecipe(null) }}
               className={`flex flex-1 items-center justify-center gap-2 rounded-md py-1.5 text-sm font-medium transition-colors ${
                 mode === 'recipe'
-                  ? 'bg-brand-500 text-white shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-brand-500 text-white shadow-sm dark:bg-accent dark:text-surface'
+                  : 'text-stone-500 hover:text-stone-700 dark:text-dt-muted dark:hover:text-dt-primary'
               }`}
             >
               <ChefHat className="h-3.5 w-3.5" />
@@ -126,8 +126,8 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
               onClick={() => { setMode('custom'); setSelectedRecipe(null) }}
               className={`flex flex-1 items-center justify-center gap-2 rounded-md py-1.5 text-sm font-medium transition-colors ${
                 mode === 'custom'
-                  ? 'bg-brand-500 text-white shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-brand-500 text-white shadow-sm dark:bg-accent dark:text-surface'
+                  : 'text-stone-500 hover:text-stone-700 dark:text-dt-muted dark:hover:text-dt-primary'
               }`}
             >
               <PenLine className="h-3.5 w-3.5" />
@@ -148,9 +148,9 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
               />
 
               {/* Recipe list */}
-              <div className="max-h-[35vh] overflow-y-auto rounded-lg border border-stone-200 md:max-h-52">
+              <div className="max-h-[35vh] overflow-y-auto rounded-lg border border-stone-200 md:max-h-52 dark:border-surface-border">
                 {filteredRecipes.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-stone-400">No recipes found</p>
+                  <p className="py-6 text-center text-sm text-stone-400 dark:text-dt-muted">No recipes found</p>
                 ) : (
                   filteredRecipes.map(recipe => {
                     const totalTime = (recipe.prep_time ?? 0) + (recipe.cook_time ?? 0)
@@ -162,9 +162,9 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
                         onClick={() => setSelectedRecipe(isSelected ? null : recipe)}
                         className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm transition-colors first:rounded-t-lg last:rounded-b-lg ${
                           isSelected
-                            ? 'bg-brand-50 text-brand-800'
-                            : 'hover:bg-stone-50 text-stone-700'
-                        } border-b border-stone-100 last:border-0`}
+                            ? 'bg-brand-50 text-brand-800 dark:bg-accent/15 dark:text-accent'
+                            : 'hover:bg-stone-50 text-stone-700 dark:hover:bg-surface-hover dark:text-dt-secondary'
+                        } border-b border-stone-100 last:border-0 dark:border-surface-border`}
                       >
                         <span className="font-medium">{recipe.title}</span>
                         {totalTime > 0 && (
@@ -179,7 +179,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
               </div>
 
               {selectedRecipe && (
-                <p className="rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700">
+                <p className="rounded-lg bg-brand-50 px-3 py-2 text-xs text-brand-700 dark:bg-accent/15 dark:text-accent">
                   ✓ Selected: <span className="font-medium">{selectedRecipe.title}</span>
                 </p>
               )}
@@ -187,7 +187,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
           ) : (
             <div className="space-y-3">
               <div>
-                <label htmlFor="custom_meal_name" className="mb-1.5 block text-sm font-medium text-stone-700">
+                <label htmlFor="custom_meal_name" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
                   Meal name
                 </label>
                 <input
@@ -206,7 +206,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
 
           {/* Servings */}
           <div className="mt-4">
-            <label htmlFor="servings" className="mb-1.5 block text-sm font-medium text-stone-700">
+            <label htmlFor="servings" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
               Servings
             </label>
             <input
@@ -222,8 +222,8 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
 
           {/* Notes */}
           <div className="mt-4">
-            <label htmlFor="notes" className="mb-1.5 block text-sm font-medium text-stone-700">
-              Notes <span className="font-normal text-stone-400">(optional)</span>
+            <label htmlFor="notes" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
+              Notes <span className="font-normal text-stone-400 dark:text-dt-muted">(optional)</span>
             </label>
             <input
               id="notes"
@@ -236,7 +236,7 @@ export default function AddMealModal({ date, mealType, householdId, recipes, exi
           </div>
 
           {error && (
-            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">{error}</p>
           )}
 
           {/* Footer */}

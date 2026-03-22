@@ -41,24 +41,24 @@ type Props = {
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'] as const
 
 const MEAL_COLORS: Record<string, string> = {
-  breakfast: 'bg-amber-50 border-amber-200 text-amber-800',
-  lunch:     'bg-sky-50 border-sky-200 text-sky-800',
-  dinner:    'bg-brand-50 border-brand-200 text-brand-800',
-  snack:     'bg-stone-50 border-stone-200 text-stone-600',
+  breakfast: 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/30 dark:border-amber-800 dark:text-amber-300',
+  lunch:     'bg-sky-50 border-sky-200 text-sky-800 dark:bg-sky-900/30 dark:border-sky-800 dark:text-sky-300',
+  dinner:    'bg-brand-50 border-brand-200 text-brand-800 dark:bg-accent/15 dark:border-accent/30 dark:text-accent',
+  snack:     'bg-stone-50 border-stone-200 text-stone-600 dark:bg-surface dark:border-surface-border dark:text-dt-secondary',
 }
 
 const MEAL_DOT: Record<string, string> = {
   breakfast: 'bg-amber-400',
   lunch:     'bg-sky-400',
-  dinner:    'bg-brand-500',
-  snack:     'bg-stone-300',
+  dinner:    'bg-brand-500 dark:bg-accent',
+  snack:     'bg-stone-300 dark:bg-dt-muted',
 }
 
 const MEAL_LABEL_COLOR: Record<string, string> = {
-  breakfast: 'text-amber-600',
-  lunch:     'text-sky-600',
-  dinner:    'text-brand-600',
-  snack:     'text-stone-500',
+  breakfast: 'text-amber-600 dark:text-amber-400',
+  lunch:     'text-sky-600 dark:text-sky-400',
+  dinner:    'text-brand-600 dark:text-accent',
+  snack:     'text-stone-500 dark:text-dt-muted',
 }
 
 export default function WeekGrid({ days, mealPlans, recipes, householdId, today }: Props) {
@@ -112,7 +112,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
         <button
           onClick={() => setSelectedDayIdx(i => Math.max(0, i - 1))}
           disabled={selectedDayIdx === 0}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30 dark:text-dt-muted dark:hover:bg-surface-hover"
           aria-label="Previous day"
         >
           <ChevronLeft className="h-4 w-4" />
@@ -128,10 +128,10 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                 onClick={() => setSelectedDayIdx(idx)}
                 className={`flex flex-1 flex-col items-center rounded-lg py-1.5 text-center transition-colors ${
                   isSelected
-                    ? 'bg-brand-500 text-white'
+                    ? 'bg-brand-500 text-white dark:bg-accent dark:text-surface'
                     : isToday
-                    ? 'bg-brand-50 text-brand-600'
-                    : 'text-stone-500 hover:bg-stone-100'
+                    ? 'bg-brand-50 text-brand-600 dark:bg-accent/15 dark:text-accent'
+                    : 'text-stone-500 hover:bg-stone-100 dark:text-dt-muted dark:hover:bg-surface-hover'
                 }`}
               >
                 <span className="text-[10px] font-medium">{day.label[0]}</span>
@@ -144,7 +144,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
         <button
           onClick={() => setSelectedDayIdx(i => Math.min(days.length - 1, i + 1))}
           disabled={selectedDayIdx === days.length - 1}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 disabled:opacity-30 dark:text-dt-muted dark:hover:bg-surface-hover"
           aria-label="Next day"
         >
           <ChevronRight className="h-4 w-4" />
@@ -153,13 +153,13 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
 
       {/* Day heading */}
       <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-lg font-semibold text-stone-900">
+        <h2 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">
           {new Date(selectedDay.date + 'T00:00:00').toLocaleDateString('en-US', {
             weekday: 'long', month: 'short', day: 'numeric',
           })}
         </h2>
         {selectedDay.date === today && (
-          <span className="rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-medium text-white">
+          <span className="rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-medium text-white dark:bg-accent dark:text-surface">
             today
           </span>
         )}
@@ -170,7 +170,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
         {MEAL_TYPES.map((mealType) => {
           const meals = getMealsForDay(selectedDay.date, mealType)
           return (
-            <div key={mealType} className="rounded-xl border border-stone-100 bg-white p-3">
+            <div key={mealType} className="rounded-xl border border-stone-100 bg-white p-3 dark:border-surface-border dark:bg-surface-raised">
               <p className={`mb-2 text-xs font-semibold uppercase tracking-wider ${MEAL_LABEL_COLOR[mealType]}`}>
                 <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${MEAL_DOT[mealType]}`} />
                 {mealType}
@@ -204,7 +204,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
               {householdId && (
                 <button
                   onClick={() => setModalState({ date: selectedDay.date, mealType })}
-                  className="flex min-h-[44px] w-full items-center gap-2 rounded-lg border-2 border-dashed border-stone-200 px-3 text-sm text-stone-400 transition-colors hover:border-brand-300 hover:text-brand-500"
+                  className="flex min-h-[44px] w-full items-center gap-2 rounded-lg border-2 border-dashed border-stone-200 px-3 text-sm text-stone-400 transition-colors hover:border-brand-300 hover:text-brand-500 dark:border-surface-border dark:text-dt-muted dark:hover:border-accent/50 dark:hover:text-accent"
                 >
                   <Plus className="h-4 w-4" />
                   Add {mealType}
@@ -216,7 +216,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
       </div>
 
       {mealPlans.length === 0 && (
-        <p className="mt-4 text-center text-sm text-stone-400">
+        <p className="mt-4 text-center text-sm text-stone-400 dark:text-dt-muted">
           {householdId ? 'Tap a meal slot to get started' : 'Set up a household first'}
         </p>
       )}
@@ -227,7 +227,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
   const DesktopGrid = () => (
     <div className="hidden md:block">
       {/* Legend */}
-      <div className="mb-4 flex items-center gap-4 text-xs text-stone-500">
+      <div className="mb-4 flex items-center gap-4 text-xs text-stone-500 dark:text-dt-secondary">
         {MEAL_TYPES.map(type => (
           <span key={type} className="flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${MEAL_DOT[type]}`} />
@@ -247,22 +247,22 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
               key={day.date}
               className={`flex min-h-[200px] flex-col rounded-xl border p-2 transition-colors ${
                 isToday
-                  ? 'border-brand-400 bg-brand-50/60 shadow-sm'
-                  : 'border-stone-200 bg-white'
+                  ? 'border-brand-400 bg-brand-50/60 shadow-sm dark:border-accent dark:bg-accent/10'
+                  : 'border-stone-200 bg-white dark:border-surface-border dark:bg-surface-raised'
               } ${isPast ? 'opacity-60' : ''}`}
             >
               {/* Day header */}
               <div className="mb-2 text-center">
-                <p className={`text-xs font-medium ${isToday ? 'text-brand-600' : 'text-stone-400'}`}>
+                <p className={`text-xs font-medium ${isToday ? 'text-brand-600 dark:text-accent' : 'text-stone-400 dark:text-dt-muted'}`}>
                   {day.label}
                 </p>
                 <p className={`text-lg font-semibold leading-tight ${
-                  isToday ? 'text-brand-700' : 'text-stone-800'
+                  isToday ? 'text-brand-700 dark:text-accent' : 'text-stone-800 dark:text-dt-primary'
                 }`}>
                   {day.dayNum}
                 </p>
                 {isToday && (
-                  <span className="mt-0.5 inline-block rounded-full bg-brand-500 px-1.5 py-px text-[10px] font-medium text-white">
+                  <span className="mt-0.5 inline-block rounded-full bg-brand-500 px-1.5 py-px text-[10px] font-medium text-white dark:bg-accent dark:text-surface">
                     today
                   </span>
                 )}
@@ -303,7 +303,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                       {householdId && (
                         <button
                           onClick={() => setModalState({ date: day.date, mealType })}
-                          className={`flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-[10px] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 ${
+                          className={`flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-[10px] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-secondary ${
                             isToday ? 'opacity-100' : 'opacity-0 group-hover/slot:opacity-100'
                           }`}
                         >
@@ -321,9 +321,9 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
       </div>
 
       {mealPlans.length === 0 && (
-        <div className="mt-6 rounded-xl border border-dashed border-stone-300 py-12 text-center">
-          <p className="text-sm font-medium text-stone-500">No meals planned this week</p>
-          <p className="mt-1 text-xs text-stone-400">
+        <div className="mt-6 rounded-xl border border-dashed border-stone-300 py-12 text-center dark:border-surface-border">
+          <p className="text-sm font-medium text-stone-500 dark:text-dt-secondary">No meals planned this week</p>
+          <p className="mt-1 text-xs text-stone-400 dark:text-dt-muted">
             {householdId
               ? 'Hover over any day and click a meal slot to get started'
               : 'Set up a household first to start planning meals'}

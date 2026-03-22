@@ -69,8 +69,8 @@ export default function InviteSection({
 
   return (
     <div className="card mb-6">
-      <h3 className="mb-3 font-semibold text-stone-900">Invite members</h3>
-      <p className="mb-4 text-sm text-stone-500">
+      <h3 className="mb-3 font-semibold text-stone-900 dark:text-dt-primary">Invite members</h3>
+      <p className="mb-4 text-sm text-stone-500 dark:text-dt-muted">
         Enter an email to generate an invite link. Copy and share it however you like.
       </p>
 
@@ -90,26 +90,26 @@ export default function InviteSection({
       </form>
 
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="mb-4 rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
       {invites.length > 0 && (
         <>
-          <h4 className="mb-2 text-sm font-medium text-stone-600">Pending invites</h4>
-          <ul className="divide-y divide-stone-100">
+          <h4 className="mb-2 text-sm font-medium text-stone-600 dark:text-dt-secondary">Pending invites</h4>
+          <ul className="divide-y divide-stone-100 dark:divide-surface-border">
             {invites.map((inv) => (
               <li key={inv.id} className="flex items-center justify-between py-2.5">
                 <div className="flex items-center gap-2 text-sm">
-                  <Clock className="h-3.5 w-3.5 text-stone-400" />
-                  <span className="text-stone-700">{inv.email}</span>
+                  <Clock className="h-3.5 w-3.5 text-stone-400 dark:text-dt-muted" />
+                  <span className="text-stone-700 dark:text-dt-secondary">{inv.email}</span>
                 </div>
-                <span className="text-xs text-stone-400">
+                <span className="text-xs text-stone-400 dark:text-dt-muted">
                   {copiedToken === inv.id ? (
                     <span className="flex items-center gap-1 text-green-600">
                       <Check className="h-3.5 w-3.5" /> Copied!
                     </span>
                   ) : (
-                    <span className="text-xs text-stone-400">
+                    <span className="text-xs text-stone-400 dark:text-dt-muted">
                       expires {new Date(inv.expires_at).toLocaleDateString()}
                     </span>
                   )}

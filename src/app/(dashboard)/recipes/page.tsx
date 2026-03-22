@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Plus, Clock, Users, BookOpen } from 'lucide-react'
 import RecipeSearch from '@/components/recipes/RecipeSearch'
 import RecipePlaceholder from '@/components/recipes/RecipePlaceholder'
@@ -14,7 +15,7 @@ export default async function RecipesPage({
 
   let query = supabase
     .from('recipes')
-    .select('id, title, description, prep_time, cook_time, servings, source, created_by, recipe_category')
+    .select('id, title, description, prep_time, cook_time, servings, source, created_by, image_url, recipe_category')
     .order('created_at', { ascending: false })
 
   if (q) {
@@ -52,22 +53,27 @@ export default async function RecipesPage({
               href={`/recipes/${recipe.id}`}
               className="card group flex flex-col transition-shadow hover:shadow-md"
             >
-              <RecipePlaceholder
-                category={recipe.recipe_category}
-                className="mb-4 h-32"
-              />
+              {/* Recipe image area */}
+              {recipe.image_url ? (
+                <Image src={recipe.image_url} alt={recipe.title} width={400} height={250} className="mb-4 h-32 w-full rounded-lg object-cover" />
+              ) : (
+                <RecipePlaceholder
+                  category={recipe.recipe_category}
+                  className="mb-4 h-32"
+                />
+              )}
 
-              <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors">
+              <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors dark:text-dt-primary dark:group-hover:text-accent">
                 {recipe.title}
               </h3>
 
               {recipe.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-stone-500">
+                <p className="mt-1 line-clamp-2 text-sm text-stone-500 dark:text-dt-secondary">
                   {recipe.description}
                 </p>
               )}
 
-              <div className="mt-auto flex items-center gap-4 pt-4 text-xs text-stone-400">
+              <div className="mt-auto flex items-center gap-4 pt-4 text-xs text-stone-400 dark:text-dt-muted">
                 {(recipe.prep_time || recipe.cook_time) && (
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
@@ -81,12 +87,12 @@ export default async function RecipesPage({
                   </span>
                 )}
                 {recipe.source === 'seeded' && (
-                  <span className="ml-auto rounded-full bg-stone-100 px-2 py-0.5 text-stone-400">
+                  <span className="ml-auto rounded-full bg-stone-100 px-2 py-0.5 text-stone-400 dark:bg-surface dark:text-dt-muted">
                     starter
                   </span>
                 )}
                 {recipe.source === 'user' && (
-                  <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-brand-500">
+                  <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-brand-500 dark:bg-accent/15 dark:text-accent">
                     yours
                   </span>
                 )}
@@ -96,11 +102,11 @@ export default async function RecipesPage({
         </div>
       ) : (
         <div className="card flex flex-col items-center justify-center py-20 text-center">
-          <div className="mb-4 rounded-2xl bg-brand-50 p-5">
-            <BookOpen className="h-10 w-10 text-brand-400" />
+          <div className="mb-4 rounded-2xl bg-brand-50 p-5 dark:bg-accent/15">
+            <BookOpen className="h-10 w-10 text-brand-400 dark:text-accent" />
           </div>
-          <h3 className="text-lg font-semibold text-stone-900">No recipes found</h3>
-          <p className="mt-1 max-w-xs text-sm text-stone-500">
+          <h3 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">No recipes found</h3>
+          <p className="mt-1 max-w-xs text-sm text-stone-500 dark:text-dt-secondary">
             {q ? `No results for "${q}"` : 'Add your first recipe to get started.'}
           </p>
           {!q && (

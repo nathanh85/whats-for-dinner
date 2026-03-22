@@ -197,6 +197,9 @@ export interface Database {
           expiry_date: string | null
           low_stock_threshold: number
           updated_at: string
+          stock_level: 'high' | 'medium' | 'low' | 'out'
+          meal_count: number | null
+          notes: string | null
         }
         Insert: {
           id?: string
@@ -208,6 +211,9 @@ export interface Database {
           expiry_date?: string | null
           low_stock_threshold?: number
           updated_at?: string
+          stock_level?: 'high' | 'medium' | 'low' | 'out'
+          meal_count?: number | null
+          notes?: string | null
         }
         Update: {
           id?: string
@@ -219,6 +225,33 @@ export interface Database {
           expiry_date?: string | null
           low_stock_threshold?: number
           updated_at?: string
+          stock_level?: 'high' | 'medium' | 'low' | 'out'
+          meal_count?: number | null
+          notes?: string | null
+        }
+        Relationships: []
+      }
+      ingredient_synonyms: {
+        Row: {
+          id: string
+          canonical_name: string
+          variant_name: string
+          category: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          canonical_name: string
+          variant_name: string
+          category?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          canonical_name?: string
+          variant_name?: string
+          category?: string | null
+          created_at?: string
         }
         Relationships: []
       }
@@ -233,6 +266,7 @@ export interface Database {
           servings: number
           notes: string | null
           created_at: string
+          variant_id: string | null
         }
         Insert: {
           id?: string
@@ -244,6 +278,7 @@ export interface Database {
           servings?: number
           notes?: string | null
           created_at?: string
+          variant_id?: string | null
         }
         Update: {
           id?: string
@@ -254,6 +289,67 @@ export interface Database {
           custom_meal_name?: string | null
           servings?: number
           notes?: string | null
+          created_at?: string
+          variant_id?: string | null
+        }
+        Relationships: []
+      }
+      recipe_variants: {
+        Row: {
+          id: string
+          recipe_id: string
+          name: string
+          description: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipe_id: string
+          name: string
+          description?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          recipe_id?: string
+          name?: string
+          description?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      recipe_variant_ingredients: {
+        Row: {
+          id: string
+          variant_id: string
+          ingredient_name: string
+          quantity: number | null
+          unit: string | null
+          action: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          variant_id: string
+          ingredient_name: string
+          quantity?: number | null
+          unit?: string | null
+          action: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          variant_id?: string
+          ingredient_name?: string
+          quantity?: number | null
+          unit?: string | null
+          action?: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name?: string | null
           created_at?: string
         }
         Relationships: []
@@ -357,6 +453,54 @@ export interface Database {
         }
         Relationships: []
       }
+      pantry_priming_items: {
+        Row: {
+          id: string
+          ingredient_name: string
+          category: string
+          display_order: number
+          is_staple: boolean
+        }
+        Insert: {
+          id?: string
+          ingredient_name: string
+          category: string
+          display_order?: number
+          is_staple?: boolean
+        }
+        Update: {
+          id?: string
+          ingredient_name?: string
+          category?: string
+          display_order?: number
+          is_staple?: boolean
+        }
+        Relationships: []
+      }
+      ingredient_categories: {
+        Row: {
+          id: string
+          ingredient_pattern: string
+          category: string
+          priority: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ingredient_pattern: string
+          category: string
+          priority?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ingredient_pattern?: string
+          category?: string
+          priority?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -388,6 +532,21 @@ export interface Database {
         }
         Returns: string
       }
+      generate_grocery_list: {
+        Args: {
+          p_household_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          ingredient_name: string
+          total_quantity: number
+          unit: string | null
+          category: string
+          recipe_sources: string
+          already_have: boolean
+        }[]
+      }
     }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -395,6 +554,8 @@ export interface Database {
       recipe_source: 'seeded' | 'user' | 'ai'
       shopping_source: 'manual' | 'meal_plan' | 'recommendation'
       invite_status: 'pending' | 'accepted' | 'expired'
+      stock_level: 'high' | 'medium' | 'low' | 'out'
+      variant_action: 'add' | 'remove' | 'swap'
     }
     CompositeTypes: Record<string, never>
   }
@@ -412,3 +573,17 @@ export type MealPlan          = Database['public']['Tables']['meal_plans']['Row'
 export type ShoppingItem      = Database['public']['Tables']['shopping_items']['Row']
 export type HouseholdInvite   = Database['public']['Tables']['household_invites']['Row']
 export type AppEvent          = Database['public']['Tables']['app_events']['Row']
+export type IngredientSynonym = Database['public']['Tables']['ingredient_synonyms']['Row']
+export type RecipeVariant     = Database['public']['Tables']['recipe_variants']['Row']
+export type RecipeVariantIngredient = Database['public']['Tables']['recipe_variant_ingredients']['Row']
+export type IngredientCategory = Database['public']['Tables']['ingredient_categories']['Row']
+export type PantryPrimingItem  = Database['public']['Tables']['pantry_priming_items']['Row']
+
+export interface GroceryListItem {
+  ingredient_name: string
+  total_quantity: number
+  unit: string | null
+  category: string
+  recipe_sources: string
+  already_have: boolean
+}

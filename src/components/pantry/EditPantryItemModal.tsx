@@ -1,15 +1,25 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { X, Loader2 } from 'lucide-react'
-import { addPantryItem } from '@/app/(dashboard)/pantry/actions'
+import { X, Loader2, ChevronDown } from 'lucide-react'
+import { updatePantryItem } from '@/app/(dashboard)/pantry/actions'
+
+type PantryItem = {
+  id: string
+  ingredient_name: string
+  quantity: number
+  unit: string | null
+  category: string | null
+  stock_level: 'high' | 'medium' | 'low' | 'out'
+  meal_count: number | null
+  notes: string | null
+}
 
 type Props = {
-  householdId: string
+  item: PantryItem
   onClose: () => void
 }
 
-const CATEGORIES = ['Proteins', 'Dairy', 'Pantry', 'Produce', 'Bread', 'Spices']
 const STOCK_LEVELS = ['high', 'medium', 'low', 'out'] as const
 
 const STOCK_BTN: Record<string, string> = {
@@ -19,19 +29,30 @@ const STOCK_BTN: Record<string, string> = {
   out:    'border-red-400 bg-red-50 text-red-700 dark:border-red-600 dark:bg-red-900/40 dark:text-red-400',
 }
 
-export default function AddPantryItemModal({ householdId, onClose }: Props) {
-  const [stockLevel, setStockLevel] = useState<typeof STOCK_LEVELS[number]>('medium')
+export default function EditPantryItemModal({ item, onClose }: Props) {
+  const [stockLevel, setStockLevel] = useState(item.stock_level)
+  const [mealCount, setMealCount] = useState(item.meal_count?.toString() ?? '')
+  const [notes, setNotes] = useState(item.notes ?? '')
+  const [showExact, setShowExact] = useState(false)
+  const [quantity, setQuantity] = useState(item.quantity.toString())
+  const [unit, setUnit] = useState(item.unit ?? '')
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    const formData = new FormData(e.currentTarget)
-    formData.set('stock_level', stockLevel)
+
+    const fd = new FormData()
+    fd.set('id', item.id)
+    fd.set('stock_level', stockLevel)
+    fd.set('meal_count', mealCount)
+    fd.set('notes', notes.trim())
+    fd.set('quantity', quantity)
+    fd.set('unit', unit.trim())
 
     startTransition(async () => {
-      const result = await addPantryItem(formData)
+      const result = await updatePantryItem(fd)
       if (result.error) {
         setError(result.error)
       } else {
@@ -45,7 +66,9 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-xl md:max-h-none md:max-w-md md:rounded-2xl dark:bg-surface-raised">
         <div className="flex items-center justify-between border-b border-stone-100 px-6 py-4 dark:border-surface-border">
-          <h2 className="text-base font-semibold text-stone-900 dark:text-dt-primary">Add pantry item</h2>
+          <h2 className="text-base font-semibold text-stone-900 dark:text-dt-primary">
+            Edit {item.ingredient_name}
+          </h2>
           <button
             onClick={onClose}
             className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-primary"
@@ -55,35 +78,6 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <input type="hidden" name="household_id" value={householdId} />
-
-          {/* Name */}
-          <div>
-            <label htmlFor="ingredient_name" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
-              Item name <span className="text-red-400">*</span>
-            </label>
-            <input
-              id="ingredient_name"
-              name="ingredient_name"
-              type="text"
-              placeholder="e.g. Olive oil, Chicken breast…"
-              className="input"
-              autoFocus
-              required
-            />
-          </div>
-
-          {/* Category */}
-          <div>
-            <label htmlFor="category" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
-              Category
-            </label>
-            <select id="category" name="category" className="input">
-              <option value="">Select category…</option>
-              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-
           {/* Stock level */}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Stock level</label>
@@ -107,15 +101,15 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
 
           {/* Meal count */}
           <div>
-            <label htmlFor="meal_count" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
-              Approximate meals <span className="font-normal text-stone-400 dark:text-dt-muted">(optional)</span>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
+              Approximate meals
             </label>
             <input
-              id="meal_count"
-              name="meal_count"
               type="number"
               min={0}
               step="1"
+              value={mealCount}
+              onChange={e => setMealCount(e.target.value)}
               placeholder="e.g. 4"
               className="input w-32"
             />
@@ -123,16 +117,50 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
 
           {/* Notes */}
           <div>
-            <label htmlFor="notes" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
-              Notes <span className="font-normal text-stone-400 dark:text-dt-muted">(optional)</span>
-            </label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Notes</label>
             <input
-              id="notes"
-              name="notes"
               type="text"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
               placeholder="e.g. check before Thursday"
               className="input"
             />
+          </div>
+
+          {/* Exact quantity (collapsible) */}
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowExact(!showExact)}
+              className="flex items-center gap-1 text-xs font-medium text-stone-400 hover:text-stone-600 dark:text-dt-muted dark:hover:text-dt-secondary"
+            >
+              <ChevronDown className={`h-3 w-3 transition-transform ${showExact ? 'rotate-180' : ''}`} />
+              Exact quantity (optional)
+            </button>
+            {showExact && (
+              <div className="mt-2 flex gap-3">
+                <div className="w-28">
+                  <input
+                    type="number"
+                    min={0}
+                    step="any"
+                    value={quantity}
+                    onChange={e => setQuantity(e.target.value)}
+                    className="input"
+                    placeholder="Qty"
+                  />
+                </div>
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={unit}
+                    onChange={e => setUnit(e.target.value)}
+                    className="input"
+                    placeholder="Unit (cups, lbs…)"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {error && (
@@ -143,7 +171,7 @@ export default function AddPantryItemModal({ householdId, onClose }: Props) {
             <button type="button" onClick={onClose} className="btn-secondary">Cancel</button>
             <button type="submit" disabled={isPending} className="btn-primary">
               {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Add item
+              Save changes
             </button>
           </div>
         </form>

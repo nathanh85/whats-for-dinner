@@ -42,12 +42,12 @@ export default function CreateHouseholdModal() {
           />
 
           {/* Dialog */}
-          <div className="relative w-full rounded-t-2xl bg-white p-6 shadow-xl md:max-w-md md:rounded-2xl">
+          <div className="relative w-full rounded-t-2xl bg-white dark:bg-surface-raised p-6 shadow-xl md:max-w-md md:rounded-2xl">
             <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-stone-900">Create a household</h2>
+              <h2 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">Create a household</h2>
               <button
                 onClick={() => setOpen(false)}
-                className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600"
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-lg text-stone-400 dark:text-dt-muted hover:bg-stone-100 dark:hover:bg-surface-hover hover:text-stone-600 dark:hover:text-dt-secondary"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -55,7 +55,7 @@ export default function CreateHouseholdModal() {
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-stone-700">
+                <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
                   Household name
                 </label>
                 <input
@@ -67,13 +67,13 @@ export default function CreateHouseholdModal() {
                   placeholder="e.g. The Smith Family"
                   className="input"
                 />
-                <p className="mt-1.5 text-xs text-stone-400">
+                <p className="mt-1.5 text-xs text-stone-400 dark:text-dt-muted">
                   You can invite others after creating the household.
                 </p>
               </div>
 
               {error && (
-                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+                <p className="rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
               )}
 
               <div className="flex items-center justify-end gap-3 pt-1">

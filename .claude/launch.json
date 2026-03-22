@@ -2,14 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Next.js Dev Server",
-      "runtimeExecutable": "C:/Program Files/nodejs/node.exe",
-      "runtimeArgs": ["C:/Program Files/nodejs/node_modules/npm/bin/npm-cli.js", "run", "dev"],
+      "name": "next-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000,
-      "env": {
-        "PATH": "C:\\Program Files\\nodejs;C:\\Windows\\system32;C:\\Windows",
-        "NODE_PATH": "C:\\Users\\natha\\OneDrive\\Documents\\whats-for-dinner\\node_modules"
-      }
+      "autoPort": true
     }
   ]
 }

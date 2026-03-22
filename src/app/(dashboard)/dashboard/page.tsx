@@ -9,28 +9,28 @@ const quickLinks = [
     label: "This week's plan",
     description: 'View and edit your meal schedule',
     icon: CalendarDays,
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
   },
   {
     href: '/recipes',
     label: 'Recipe book',
     description: 'Browse and add recipes',
     icon: BookOpen,
-    color: 'bg-green-50 text-green-600',
+    color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
   },
   {
     href: '/pantry',
     label: 'Pantry',
     description: "See what's in stock",
     icon: Package,
-    color: 'bg-amber-50 text-amber-600',
+    color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
   },
   {
     href: '/shopping',
     label: 'Shopping list',
     description: 'Manage what to buy',
     icon: ShoppingCart,
-    color: 'bg-purple-50 text-purple-600',
+    color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
   },
 ]
 
@@ -62,8 +62,8 @@ export default async function DashboardPage() {
     householdId
       ? supabase.from('meal_plans').select('id', { count: 'exact', head: true })
           .eq('household_id', householdId)
-          .gte('planned_for', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
-          .lte('planned_for', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .gte('date', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+          .lte('date', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
       : Promise.resolve({ count: 0 }),
     supabase.from('recipe_interactions').select('id', { count: 'exact', head: true })
       .eq('user_id', user!.id)
@@ -90,14 +90,14 @@ export default async function DashboardPage() {
       {/* Greeting */}
       <div className="page-header">
         <h1 className="page-title">
-          {greeting}, {displayName}! 👋
+          {greeting}, {displayName}!
         </h1>
         <p className="page-subtitle">Here&apos;s a quick overview of your household.</p>
       </div>
 
       {/* Quick links */}
       <section className="mb-8">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-400">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">
           Quick access
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -111,8 +111,8 @@ export default async function DashboardPage() {
                 <Icon className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-semibold text-stone-900">{label}</p>
-                <p className="text-sm text-stone-500">{description}</p>
+                <p className="font-semibold text-stone-900 dark:text-dt-primary">{label}</p>
+                <p className="text-sm text-stone-500 dark:text-dt-secondary">{description}</p>
               </div>
             </Link>
           ))}
@@ -121,14 +121,14 @@ export default async function DashboardPage() {
 
       {/* Placeholder stats */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-400">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">
           At a glance
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map(({ label, value }) => (
             <div key={label} className="card text-center">
-              <p className="text-3xl font-bold text-stone-900">{value}</p>
-              <p className="mt-1 text-xs text-stone-500">{label}</p>
+              <p className="text-3xl font-bold text-stone-900 dark:text-dt-primary">{value}</p>
+              <p className="mt-1 text-xs text-stone-500 dark:text-dt-secondary">{label}</p>
             </div>
           ))}
         </div>
