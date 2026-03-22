@@ -52,21 +52,21 @@ export default async function RecipesPage({
               className="card group flex flex-col transition-shadow hover:shadow-md"
             >
               {/* Placeholder image area */}
-              <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-amber-100">
-                <BookOpen className="h-8 w-8 text-brand-300" />
+              <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-amber-100 dark:from-surface dark:to-surface-hover">
+                <BookOpen className="h-8 w-8 text-brand-300 dark:text-accent/50" />
               </div>
 
-              <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors">
+              <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors dark:text-dt-primary dark:group-hover:text-accent">
                 {recipe.title}
               </h3>
 
               {recipe.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-stone-500">
+                <p className="mt-1 line-clamp-2 text-sm text-stone-500 dark:text-dt-secondary">
                   {recipe.description}
                 </p>
               )}
 
-              <div className="mt-auto flex items-center gap-4 pt-4 text-xs text-stone-400">
+              <div className="mt-auto flex items-center gap-4 pt-4 text-xs text-stone-400 dark:text-dt-muted">
                 {(recipe.prep_time || recipe.cook_time) && (
                   <span className="flex items-center gap-1">
                     <Clock className="h-3.5 w-3.5" />
@@ -80,12 +80,12 @@ export default async function RecipesPage({
                   </span>
                 )}
                 {recipe.source === 'seeded' && (
-                  <span className="ml-auto rounded-full bg-stone-100 px-2 py-0.5 text-stone-400">
+                  <span className="ml-auto rounded-full bg-stone-100 px-2 py-0.5 text-stone-400 dark:bg-surface dark:text-dt-muted">
                     starter
                   </span>
                 )}
                 {recipe.source === 'user' && (
-                  <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-brand-500">
+                  <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-brand-500 dark:bg-accent/15 dark:text-accent">
                     yours
                   </span>
                 )}
@@ -95,11 +95,11 @@ export default async function RecipesPage({
         </div>
       ) : (
         <div className="card flex flex-col items-center justify-center py-20 text-center">
-          <div className="mb-4 rounded-2xl bg-brand-50 p-5">
-            <BookOpen className="h-10 w-10 text-brand-400" />
+          <div className="mb-4 rounded-2xl bg-brand-50 p-5 dark:bg-accent/15">
+            <BookOpen className="h-10 w-10 text-brand-400 dark:text-accent" />
           </div>
-          <h3 className="text-lg font-semibold text-stone-900">No recipes found</h3>
-          <p className="mt-1 max-w-xs text-sm text-stone-500">
+          <h3 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">No recipes found</h3>
+          <p className="mt-1 max-w-xs text-sm text-stone-500 dark:text-dt-secondary">
             {q ? `No results for "${q}"` : 'Add your first recipe to get started.'}
           </p>
           {!q && (

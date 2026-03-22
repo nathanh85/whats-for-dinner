@@ -32,11 +32,11 @@ export default function LoginPage() {
 
   return (
     <div className="card">
-      <h2 className="mb-6 text-xl font-semibold text-stone-900">Sign in to your account</h2>
+      <h2 className="mb-6 text-xl font-semibold text-stone-900 dark:text-dt-primary">Sign in to your account</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-stone-700">
+          <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
             Email address
           </label>
           <input
@@ -52,7 +52,7 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-stone-700">
+          <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
             Password
           </label>
           <input
@@ -68,7 +68,7 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">{error}</p>
         )}
 
         <button type="submit" disabled={loading} className="btn-primary w-full">
@@ -77,9 +77,9 @@ export default function LoginPage() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-stone-500">
+      <p className="mt-6 text-center text-sm text-stone-500 dark:text-dt-secondary">
         Don&apos;t have an account?{' '}
-        <Link href="/signup" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link href="/signup" className="font-medium text-brand-600 hover:text-brand-700 dark:text-accent dark:hover:text-accent-hover">
           Create one
         </Link>
       </p>

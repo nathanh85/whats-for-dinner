@@ -194,6 +194,9 @@ export interface Database {
           expiry_date: string | null
           low_stock_threshold: number
           updated_at: string
+          stock_level: 'high' | 'medium' | 'low' | 'out'
+          meal_count: number | null
+          notes: string | null
         }
         Insert: {
           id?: string
@@ -205,6 +208,9 @@ export interface Database {
           expiry_date?: string | null
           low_stock_threshold?: number
           updated_at?: string
+          stock_level?: 'high' | 'medium' | 'low' | 'out'
+          meal_count?: number | null
+          notes?: string | null
         }
         Update: {
           id?: string
@@ -216,6 +222,33 @@ export interface Database {
           expiry_date?: string | null
           low_stock_threshold?: number
           updated_at?: string
+          stock_level?: 'high' | 'medium' | 'low' | 'out'
+          meal_count?: number | null
+          notes?: string | null
+        }
+        Relationships: []
+      }
+      ingredient_synonyms: {
+        Row: {
+          id: string
+          canonical_name: string
+          variant_name: string
+          category: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          canonical_name: string
+          variant_name: string
+          category?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          canonical_name?: string
+          variant_name?: string
+          category?: string | null
+          created_at?: string
         }
         Relationships: []
       }
@@ -230,6 +263,7 @@ export interface Database {
           servings: number
           notes: string | null
           created_at: string
+          variant_id: string | null
         }
         Insert: {
           id?: string
@@ -241,6 +275,7 @@ export interface Database {
           servings?: number
           notes?: string | null
           created_at?: string
+          variant_id?: string | null
         }
         Update: {
           id?: string
@@ -251,6 +286,67 @@ export interface Database {
           custom_meal_name?: string | null
           servings?: number
           notes?: string | null
+          created_at?: string
+          variant_id?: string | null
+        }
+        Relationships: []
+      }
+      recipe_variants: {
+        Row: {
+          id: string
+          recipe_id: string
+          name: string
+          description: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          recipe_id: string
+          name: string
+          description?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          recipe_id?: string
+          name?: string
+          description?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      recipe_variant_ingredients: {
+        Row: {
+          id: string
+          variant_id: string
+          ingredient_name: string
+          quantity: number | null
+          unit: string | null
+          action: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          variant_id: string
+          ingredient_name: string
+          quantity?: number | null
+          unit?: string | null
+          action: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          variant_id?: string
+          ingredient_name?: string
+          quantity?: number | null
+          unit?: string | null
+          action?: 'add' | 'remove' | 'swap'
+          replaces_ingredient_name?: string | null
           created_at?: string
         }
         Relationships: []
@@ -392,6 +488,8 @@ export interface Database {
       recipe_source: 'seeded' | 'user' | 'ai'
       shopping_source: 'manual' | 'meal_plan' | 'recommendation'
       invite_status: 'pending' | 'accepted' | 'expired'
+      stock_level: 'high' | 'medium' | 'low' | 'out'
+      variant_action: 'add' | 'remove' | 'swap'
     }
     CompositeTypes: Record<string, never>
   }
@@ -409,3 +507,6 @@ export type MealPlan          = Database['public']['Tables']['meal_plans']['Row'
 export type ShoppingItem      = Database['public']['Tables']['shopping_items']['Row']
 export type HouseholdInvite   = Database['public']['Tables']['household_invites']['Row']
 export type AppEvent          = Database['public']['Tables']['app_events']['Row']
+export type IngredientSynonym = Database['public']['Tables']['ingredient_synonyms']['Row']
+export type RecipeVariant     = Database['public']['Tables']['recipe_variants']['Row']
+export type RecipeVariantIngredient = Database['public']['Tables']['recipe_variant_ingredients']['Row']

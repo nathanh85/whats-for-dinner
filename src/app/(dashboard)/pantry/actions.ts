@@ -14,18 +14,19 @@ export async function addPantryItem(formData: FormData) {
   const ingredientName = (formData.get('ingredient_name') as string).trim()
   if (!ingredientName) return { error: 'Item name is required' }
 
-  const quantity = Number(formData.get('quantity') ?? 1)
-  const unit = (formData.get('unit') as string)?.trim() || null
   const category = (formData.get('category') as string)?.trim() || null
-  const expiryDate = (formData.get('expiry_date') as string) || null
+  const stockLevel = ((formData.get('stock_level') as string) || 'medium') as 'high' | 'medium' | 'low' | 'out'
+  const mealCountStr = formData.get('meal_count') as string
+  const mealCount = mealCountStr ? Number(mealCountStr) : null
+  const notes = (formData.get('notes') as string)?.trim() || null
 
   const { error } = await supabase.from('pantry_items').insert({
     household_id: householdId,
     ingredient_name: ingredientName,
-    quantity,
-    unit,
     category,
-    expiry_date: expiryDate,
+    stock_level: stockLevel,
+    meal_count: mealCount,
+    notes,
   })
 
   if (error) return { error: error.message }
@@ -40,11 +41,22 @@ export async function updatePantryItem(formData: FormData) {
   if (!user) return { error: 'Not authenticated' }
 
   const id = formData.get('id') as string
-  const quantity = Number(formData.get('quantity'))
+  const stockLevel = (formData.get('stock_level') as string) as 'high' | 'medium' | 'low' | 'out'
+  const mealCountStr = formData.get('meal_count') as string
+  const mealCount = mealCountStr ? Number(mealCountStr) : null
+  const notes = (formData.get('notes') as string)?.trim() || null
+  const quantity = Number(formData.get('quantity') ?? 0)
+  const unit = (formData.get('unit') as string)?.trim() || null
 
   const { error } = await supabase
     .from('pantry_items')
-    .update({ quantity })
+    .update({
+      stock_level: stockLevel,
+      meal_count: mealCount,
+      notes,
+      quantity,
+      unit,
+    })
     .eq('id', id)
 
   if (error) return { error: error.message }

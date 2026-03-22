@@ -35,7 +35,7 @@ export default function RecipeSearch() {
   return (
     <div className="mb-6 space-y-3">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 dark:text-dt-muted" />
         <input
           type="search"
           defaultValue={searchParams.get('q') ?? ''}
@@ -54,8 +54,8 @@ export default function RecipeSearch() {
             onClick={() => handleFilter(value)}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
               currentFilter === value
-                ? 'bg-brand-500 text-white'
-                : 'border border-stone-200 bg-white text-stone-600 hover:bg-stone-50'
+                ? 'bg-brand-500 text-white dark:bg-accent dark:text-surface'
+                : 'border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 dark:border-surface-border dark:bg-surface-raised dark:text-dt-secondary dark:hover:bg-surface-hover'
             }`}
           >
             {label}

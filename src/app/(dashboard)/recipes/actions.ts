@@ -58,3 +58,51 @@ export async function createRecipe(formData: FormData) {
   await logEventServer('recipe.created', { recipe_id: recipe.id })
   redirect(`/recipes/${recipe.id}`)
 }
+
+export async function addMealFromRecipe(input: {
+  householdId: string
+  recipeId: string
+  date: string
+  mealType: 'breakfast' | 'lunch' | 'dinner'
+  servings: number
+  notes: string | null
+}) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase.from('meal_plans').insert({
+    household_id: input.householdId,
+    date: input.date,
+    meal_type: input.mealType,
+    recipe_id: input.recipeId,
+    servings: input.servings,
+    notes: input.notes,
+  })
+
+  if (error) return { error: error.message }
+
+  await logEventServer('meal.planned', {
+    recipe_id: input.recipeId,
+    meal_type: input.mealType,
+    date: input.date,
+  })
+  return { success: true }
+}
+
+export async function logAsCooked(recipeId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase.from('recipe_interactions').insert({
+    user_id: user.id,
+    recipe_id: recipeId,
+    cooked_at: new Date().toISOString(),
+  })
+
+  if (error) return { error: error.message }
+
+  await logEventServer('recipe.cooked', { recipe_id: recipeId })
+  return { success: true }
+}

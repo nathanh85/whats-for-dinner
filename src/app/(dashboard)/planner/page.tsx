@@ -119,7 +119,7 @@ export default async function PlannerPage({
 
       {/* No household warning */}
       {!profile?.household_id && (
-        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
           You need a household to save meal plans.{' '}
           <a href="/household" className="font-medium underline underline-offset-2">
             Set one up →
