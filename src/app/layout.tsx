@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ThemeProvider from '@/components/ThemeProvider'
+import { APP_VERSION } from '@/lib/version'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
+        <meta name="version" content={APP_VERSION} />
         <script
           dangerouslySetInnerHTML={{
             __html: `try{const t=localStorage.getItem('theme');const d=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme:dark)').matches);if(d)document.documentElement.classList.add('dark')}catch(e){}`,

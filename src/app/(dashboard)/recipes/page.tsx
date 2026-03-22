@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Plus, Clock, Users, BookOpen } from 'lucide-react'
 import RecipeSearch from '@/components/recipes/RecipeSearch'
 
@@ -13,7 +14,7 @@ export default async function RecipesPage({
 
   let query = supabase
     .from('recipes')
-    .select('id, title, description, prep_time, cook_time, servings, source, created_by')
+    .select('id, title, description, prep_time, cook_time, servings, source, created_by, image_url')
     .order('created_at', { ascending: false })
 
   if (q) {
@@ -51,10 +52,14 @@ export default async function RecipesPage({
               href={`/recipes/${recipe.id}`}
               className="card group flex flex-col transition-shadow hover:shadow-md"
             >
-              {/* Placeholder image area */}
-              <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-amber-100 dark:from-surface dark:to-surface-hover">
-                <BookOpen className="h-8 w-8 text-brand-300 dark:text-accent/50" />
-              </div>
+              {/* Recipe image area */}
+              {recipe.image_url ? (
+                <Image src={recipe.image_url} alt={recipe.title} width={400} height={250} className="mb-4 h-32 w-full rounded-lg object-cover" />
+              ) : (
+                <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-amber-100 dark:from-surface dark:to-surface-hover">
+                  <BookOpen className="h-8 w-8 text-brand-300 dark:text-accent/50" />
+                </div>
+              )}
 
               <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors dark:text-dt-primary dark:group-hover:text-accent">
                 {recipe.title}

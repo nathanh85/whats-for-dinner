@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { Plus, Trash2, Loader2, Package, Pencil } from 'lucide-react'
+import { useState, useMemo, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import { Plus, Trash2, Loader2, Package, Pencil, Search } from 'lucide-react'
 import { updatePantryItem, deletePantryItem } from '@/app/(dashboard)/pantry/actions'
 import AddPantryItemModal from './AddPantryItemModal'
 import EditPantryItemModal from './EditPantryItemModal'
+import PantryPrimingWizard from './PantryPrimingWizard'
 
 type PantryItem = {
   id: string
@@ -39,13 +41,36 @@ const STOCK_LABEL: Record<string, string> = {
 }
 
 export default function PantryList({ items, householdId }: Props) {
+  const router = useRouter()
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingItem, setEditingItem] = useState<PantryItem | null>(null)
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeCategory, setActiveCategory] = useState<string>('All')
+
+  // All unique categories for filter pills
+  const allCategories = useMemo(() => {
+    const cats = new Set<string>()
+    items.forEach(item => cats.add(item.category ?? 'Uncategorized'))
+    return ['All', ...Array.from(cats).sort((a, b) => {
+      if (a === 'Uncategorized') return 1
+      if (b === 'Uncategorized') return -1
+      return a.localeCompare(b)
+    })]
+  }, [items])
+
+  // Filter items by search + category
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      const matchesSearch = searchQuery === '' || item.ingredient_name.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesCategory = activeCategory === 'All' || (item.category ?? 'Uncategorized') === activeCategory
+      return matchesSearch && matchesCategory
+    })
+  }, [items, searchQuery, activeCategory])
 
   // Group by category
-  const grouped = items.reduce<Record<string, PantryItem[]>>((acc, item) => {
+  const grouped = filteredItems.reduce<Record<string, PantryItem[]>>((acc, item) => {
     const key = item.category ?? 'Uncategorized'
     if (!acc[key]) acc[key] = []
     acc[key].push(item)
@@ -68,39 +93,52 @@ export default function PantryList({ items, householdId }: Props) {
 
   if (items.length === 0) {
     return (
-      <>
-        <div className="rounded-xl border border-dashed border-stone-300 py-16 text-center dark:border-surface-border">
-          <Package className="mx-auto h-8 w-8 text-stone-300 dark:text-dt-muted" />
-          <p className="mt-3 text-sm font-medium text-stone-500 dark:text-dt-secondary">Your pantry is empty</p>
-          <p className="mt-1 text-xs text-stone-400 dark:text-dt-muted">Add items to keep track of what you have on hand</p>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="btn-primary mt-4"
-          >
-            <Plus className="h-4 w-4" />
-            Add first item
-          </button>
-        </div>
-
-        {showAddModal && (
-          <AddPantryItemModal householdId={householdId} onClose={() => setShowAddModal(false)} />
-        )}
-      </>
+      <PantryPrimingWizard
+        householdId={householdId}
+        onComplete={() => router.refresh()}
+      />
     )
   }
 
   return (
     <>
-      {/* Add button */}
-      <div className="mb-6 flex justify-end">
-        <button onClick={() => setShowAddModal(true)} className="btn-primary">
+      {/* Search + Add button */}
+      <div className="mb-4 flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400 dark:text-dt-muted" />
+          <input
+            type="text"
+            placeholder="Search pantry items..."
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full rounded-lg border border-stone-200 bg-white py-2 pl-9 pr-3 text-sm text-stone-800 placeholder:text-stone-400 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 dark:border-surface-border dark:bg-surface-raised dark:text-dt-primary dark:placeholder:text-dt-muted dark:focus:border-accent dark:focus:ring-accent"
+          />
+        </div>
+        <button onClick={() => setShowAddModal(true)} className="btn-primary shrink-0">
           <Plus className="h-4 w-4" />
           Add item
         </button>
       </div>
 
-      {/* Category groups */}
-      <div className="space-y-6">
+      {/* Category filter pills */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        {allCategories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setActiveCategory(cat)}
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              activeCategory === cat
+                ? 'bg-brand-500 text-white dark:bg-accent dark:text-white'
+                : 'border border-stone-200 bg-white text-stone-600 hover:bg-stone-50 dark:border-surface-border dark:bg-surface-raised dark:text-dt-secondary dark:hover:bg-surface-hover'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Category groups — two columns on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {sortedCategories.map(category => (
           <div key={category}>
             <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">

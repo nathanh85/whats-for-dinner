@@ -25,6 +25,7 @@ export async function createRecipe(formData: FormData) {
       prep_time: prepTime,
       cook_time: cookTime,
       servings,
+      image_url: (formData.get('image_url') as string)?.trim() || null,
       source: 'user',
       created_by: user.id,
       is_public: formData.get('is_public') === 'true',

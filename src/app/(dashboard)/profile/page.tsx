@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { User, Mail, Home } from 'lucide-react'
 import ProfileActions from '@/components/profile/ProfileActions'
+import { APP_VERSION } from '@/lib/version'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -73,6 +74,12 @@ export default async function ProfilePage() {
 
         <div className="border-t border-stone-100 pt-4 dark:border-surface-border">
           <ProfileActions />
+        </div>
+
+        <div className="border-t border-stone-100 pt-3 dark:border-surface-border">
+          <p className="text-center text-[10px] text-stone-300 dark:text-dt-muted">
+            What&apos;s for Dinner? v{APP_VERSION}
+          </p>
         </div>
       </div>
     </div>

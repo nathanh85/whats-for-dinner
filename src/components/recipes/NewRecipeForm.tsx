@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import Image from 'next/image'
 import { Plus, Trash2, Loader2 } from 'lucide-react'
 import { createRecipe } from '@/app/(dashboard)/recipes/actions'
 
@@ -15,6 +16,8 @@ export default function NewRecipeForm() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([
     { id: 1, name: '', qty: '', unit: '' },
   ])
+  const [imageUrl, setImageUrl] = useState('')
+  const [imageError, setImageError] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -63,6 +66,30 @@ export default function NewRecipeForm() {
           />
         </div>
 
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Image URL</label>
+          <input
+            name="image_url"
+            type="url"
+            className="input"
+            placeholder="https://example.com/photo.jpg"
+            value={imageUrl}
+            onChange={(e) => { setImageUrl(e.target.value); setImageError(false) }}
+          />
+          {imageUrl && !imageError && (
+            <div className="mt-2 overflow-hidden rounded-lg">
+              <Image
+                src={imageUrl}
+                alt="Preview"
+                width={200}
+                height={120}
+                className="h-24 w-full object-cover"
+                onError={() => setImageError(true)}
+              />
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Prep (min)</label>
@@ -107,12 +134,26 @@ export default function NewRecipeForm() {
               placeholder="Qty"
               className="input w-20"
             />
-            <input
+            <select
               name="ingredient_unit"
-              type="text"
-              placeholder="Unit"
-              className="input w-24"
-            />
+              className="input w-28"
+            >
+              <option value="">Unit</option>
+              <option value="cups">cups</option>
+              <option value="tbsp">tbsp</option>
+              <option value="tsp">tsp</option>
+              <option value="oz">oz</option>
+              <option value="lb">lb</option>
+              <option value="each">each</option>
+              <option value="cloves">cloves</option>
+              <option value="slices">slices</option>
+              <option value="pieces">pieces</option>
+              <option value="cans">cans</option>
+              <option value="whole">whole</option>
+              <option value="bunch">bunch</option>
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+            </select>
             <input
               name="ingredient_name"
               type="text"

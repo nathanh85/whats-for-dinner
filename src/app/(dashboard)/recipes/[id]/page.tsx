@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowLeft, BookOpen } from 'lucide-react'
 import RecipeActions from '@/components/recipes/RecipeActions'
 
@@ -50,9 +51,13 @@ export default async function RecipeDetailPage({
 
       {/* Header */}
       <div className="card mb-6">
-        <div className="mb-4 flex h-40 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 dark:from-surface dark:to-surface-hover">
-          <BookOpen className="h-12 w-12 text-brand-300 dark:text-accent/50" />
-        </div>
+        {recipe.image_url ? (
+          <Image src={recipe.image_url} alt={recipe.title} width={800} height={300} className="mb-4 h-56 w-full rounded-xl object-cover" />
+        ) : (
+          <div className="mb-4 flex h-40 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-amber-100 dark:from-surface dark:to-surface-hover">
+            <BookOpen className="h-12 w-12 text-brand-300 dark:text-accent/50" />
+          </div>
+        )}
 
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold text-stone-900 dark:text-dt-primary">{recipe.title}</h1>

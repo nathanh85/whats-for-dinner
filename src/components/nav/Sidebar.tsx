@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import ThemeToggle from '@/components/ThemeToggle'
+import { APP_VERSION } from '@/lib/version'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard',    icon: LayoutDashboard },
@@ -96,6 +97,7 @@ export default function Sidebar() {
             <LogOut className="h-4 w-4" />
             Sign out
           </button>
+          <p className="px-3 pt-1 text-[10px] text-stone-300 dark:text-dt-muted">v{APP_VERSION}</p>
         </div>
       </aside>
 

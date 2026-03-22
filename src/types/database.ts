@@ -450,6 +450,30 @@ export interface Database {
         }
         Relationships: []
       }
+      pantry_priming_items: {
+        Row: {
+          id: string
+          ingredient_name: string
+          category: string
+          display_order: number
+          is_staple: boolean
+        }
+        Insert: {
+          id?: string
+          ingredient_name: string
+          category: string
+          display_order?: number
+          is_staple?: boolean
+        }
+        Update: {
+          id?: string
+          ingredient_name?: string
+          category?: string
+          display_order?: number
+          is_staple?: boolean
+        }
+        Relationships: []
+      }
       ingredient_categories: {
         Row: {
           id: string
@@ -550,6 +574,7 @@ export type IngredientSynonym = Database['public']['Tables']['ingredient_synonym
 export type RecipeVariant     = Database['public']['Tables']['recipe_variants']['Row']
 export type RecipeVariantIngredient = Database['public']['Tables']['recipe_variant_ingredients']['Row']
 export type IngredientCategory = Database['public']['Tables']['ingredient_categories']['Row']
+export type PantryPrimingItem  = Database['public']['Tables']['pantry_priming_items']['Row']
 
 export interface GroceryListItem {
   ingredient_name: string
