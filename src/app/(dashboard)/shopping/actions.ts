@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { logEventServer } from '@/lib/events-server'
 
 // Helper: Monday of the current week
 function getWeekRange() {
@@ -171,6 +172,7 @@ export async function generateFromMealPlan(householdId: string) {
 
   if (insertError) return { error: insertError.message }
 
+  await logEventServer('shopping.generated', { items_added: toInsert.length })
   revalidatePath('/shopping')
   return { success: true, added: toInsert.length }
 }

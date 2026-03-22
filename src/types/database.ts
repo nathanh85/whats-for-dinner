@@ -223,7 +223,7 @@ export interface Database {
         Row: {
           id: string
           household_id: string | null
-          planned_for: string
+          date: string
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id: string | null
           custom_meal_name: string | null
@@ -234,7 +234,7 @@ export interface Database {
         Insert: {
           id?: string
           household_id?: string | null
-          planned_for: string
+          date: string
           meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id?: string | null
           custom_meal_name?: string | null
@@ -245,7 +245,7 @@ export interface Database {
         Update: {
           id?: string
           household_id?: string | null
-          planned_for?: string
+          date?: string
           meal_type?: 'breakfast' | 'lunch' | 'dinner' | 'snack'
           recipe_id?: string | null
           custom_meal_name?: string | null
@@ -294,6 +294,66 @@ export interface Database {
         }
         Relationships: []
       }
+      household_invites: {
+        Row: {
+          id: string
+          household_id: string
+          invited_by: string
+          email: string
+          token: string
+          status: 'pending' | 'accepted' | 'expired'
+          expires_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          household_id: string
+          invited_by: string
+          email: string
+          token?: string
+          status?: 'pending' | 'accepted' | 'expired'
+          expires_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          household_id?: string
+          invited_by?: string
+          email?: string
+          token?: string
+          status?: 'pending' | 'accepted' | 'expired'
+          expires_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      app_events: {
+        Row: {
+          id: string
+          event_type: string
+          user_id: string | null
+          household_id: string | null
+          payload: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_type: string
+          user_id?: string | null
+          household_id?: string | null
+          payload?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_type?: string
+          user_id?: string | null
+          household_id?: string | null
+          payload?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -305,12 +365,33 @@ export interface Database {
         Args: Record<string, never>
         Returns: string[]
       }
+      log_event: {
+        Args: { p_event_type: string; p_payload?: Json }
+        Returns: void
+      }
+      validate_invite: {
+        Args: { p_token: string }
+        Returns: { valid: boolean; household_name: string | null; email: string | null }
+      }
+      accept_invite: {
+        Args: { p_token: string }
+        Returns: void
+      }
+      create_managed_profile: {
+        Args: {
+          p_display_name: string
+          p_avatar_color?: string
+          p_dietary_restrictions?: string[]
+        }
+        Returns: string
+      }
     }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
       member_role: 'admin' | 'member'
       recipe_source: 'seeded' | 'user' | 'ai'
       shopping_source: 'manual' | 'meal_plan' | 'recommendation'
+      invite_status: 'pending' | 'accepted' | 'expired'
     }
     CompositeTypes: Record<string, never>
   }
@@ -326,3 +407,5 @@ export type RecipeInteraction = Database['public']['Tables']['recipe_interaction
 export type PantryItem        = Database['public']['Tables']['pantry_items']['Row']
 export type MealPlan          = Database['public']['Tables']['meal_plans']['Row']
 export type ShoppingItem      = Database['public']['Tables']['shopping_items']['Row']
+export type HouseholdInvite   = Database['public']['Tables']['household_invites']['Row']
+export type AppEvent          = Database['public']['Tables']['app_events']['Row']

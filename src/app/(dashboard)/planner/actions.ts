@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { logEventServer } from '@/lib/events-server'
 
 export async function addMeal(formData: FormData) {
   const supabase = await createClient()
@@ -31,8 +32,12 @@ export async function addMeal(formData: FormData) {
     notes,
   })
 
-  if (error) return { error: error.message }
+  if (error) {
+    await logEventServer('error.server', { message: error.message, action: 'addMeal' })
+    return { error: error.message }
+  }
 
+  await logEventServer('meal.planned', { recipe_id: recipeId, meal_type: mealType, date })
   revalidatePath('/planner')
   return { success: true }
 }

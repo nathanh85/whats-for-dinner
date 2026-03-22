@@ -130,7 +130,7 @@ export default async function PlannerPage({
       {/* Week grid — interactive client component */}
       <WeekGrid
         days={days}
-        mealPlans={mealPlans ?? []}
+        mealPlans={(mealPlans ?? []) as unknown as Parameters<typeof WeekGrid>[0]['mealPlans']}
         recipes={recipes ?? []}
         householdId={profile?.household_id ?? null}
         today={toDateString(new Date())}

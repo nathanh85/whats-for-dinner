@@ -34,7 +34,8 @@ export async function middleware(request: NextRequest) {
 
   // Redirect unauthenticated users away from protected routes
   const isAuthRoute = pathname.startsWith('/login') || pathname.startsWith('/signup')
-  const isProtected = !isAuthRoute && pathname !== '/'
+  const isPublicRoute = pathname.startsWith('/join/')
+  const isProtected = !isAuthRoute && !isPublicRoute && pathname !== '/'
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone()

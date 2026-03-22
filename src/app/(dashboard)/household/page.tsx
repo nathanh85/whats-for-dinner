@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
-import { Users, Plus, Shield, User } from 'lucide-react'
+import { Users, Shield, User, UserCheck } from 'lucide-react'
 import CreateHouseholdModal from '@/components/household/CreateHouseholdModal'
 import RenameHouseholdForm from '@/components/household/RenameHouseholdForm'
+import InviteSection from '@/components/household/InviteSection'
+import AddManagedProfileModal from '@/components/household/AddManagedProfileModal'
 
 const roleLabel = { admin: 'Admin', member: 'Member' } as const
 
@@ -18,16 +20,37 @@ export default async function HouseholdPage() {
 
   const household = profile?.households as unknown as { id: string; name: string } | null
 
-  // If they're in a household, load all members with their profiles
+  // If they're in a household, load members, invites, and all profiles (including managed)
   const members = household
     ? await supabase
         .from('household_members')
-        .select('id, role, user_id, profiles(id, display_name, avatar_color)')
+        .select('id, role, user_id, profiles(id, display_name, avatar_color, is_managed)')
         .eq('household_id', household.id)
         .then(({ data }) => data ?? [])
     : []
 
-  // Query current user's role directly (more reliable than find on joined data)
+  // Load managed profiles (no user_id, not in household_members)
+  const managedProfiles = household
+    ? await supabase
+        .from('profiles')
+        .select('id, display_name, avatar_color, dietary_restrictions, is_managed')
+        .eq('household_id', household.id)
+        .eq('is_managed', true)
+        .then(({ data }) => data ?? [])
+    : []
+
+  // Load pending invites
+  const pendingInvites = household
+    ? await supabase
+        .from('household_invites')
+        .select('id, email, created_at, expires_at')
+        .eq('household_id', household.id)
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .then(({ data }) => data ?? [])
+    : []
+
+  // Query current user's role directly
   const { data: myMembership } = household
     ? await supabase
         .from('household_members')
@@ -38,6 +61,7 @@ export default async function HouseholdPage() {
     : { data: null }
 
   const currentMember = myMembership ?? members.find((m) => m.user_id === user!.id)
+  const isAdmin = currentMember?.role === 'admin'
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -73,19 +97,17 @@ export default async function HouseholdPage() {
               <h3 className="font-semibold text-stone-900">
                 Members{' '}
                 <span className="ml-1 text-sm font-normal text-stone-400">
-                  ({members.length})
+                  ({members.length + managedProfiles.length})
                 </span>
               </h3>
-              <button className="btn-primary text-xs">
-                <Plus className="h-3.5 w-3.5" />
-                Invite member
-              </button>
+              {isAdmin && <AddManagedProfileModal />}
             </div>
 
             <ul className="divide-y divide-stone-100">
+              {/* Auth members */}
               {members.map((member) => {
                 const memberProfile = member.profiles as unknown as
-                  | { id: string; display_name: string; avatar_color: string }
+                  | { id: string; display_name: string; avatar_color: string; is_managed: boolean }
                   | null
                 const isYou = member.user_id === user!.id
                 const RoleIcon = member.role === 'admin' ? Shield : User
@@ -115,21 +137,44 @@ export default async function HouseholdPage() {
                   </li>
                 )
               })}
+
+              {/* Managed profiles */}
+              {managedProfiles.map((mp) => (
+                <li key={mp.id} className="flex items-center gap-3 py-3">
+                  <div
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+                    style={{ backgroundColor: mp.avatar_color ?? '#5DCAA5' }}
+                  >
+                    {mp.display_name?.[0]?.toUpperCase() ?? '?'}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-stone-900">
+                      {mp.display_name}
+                    </p>
+                    {mp.dietary_restrictions?.length > 0 && (
+                      <p className="truncate text-xs text-stone-400">
+                        {mp.dietary_restrictions.join(', ')}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-xs text-stone-400">
+                    <UserCheck className="h-3.5 w-3.5" />
+                    Managed
+                  </div>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Invite link — stub for now */}
-          <div className="card">
-            <h3 className="mb-2 font-semibold text-stone-900">Invite link</h3>
-            <p className="mb-3 text-sm text-stone-500">
-              Share this link to let others join your household.
-            </p>
-            <input
-              readOnly
-              value="Coming soon…"
-              className="input font-mono text-xs text-stone-400"
+          {/* Invite section */}
+          {isAdmin && (
+            <InviteSection
+              householdId={household.id}
+              initialInvites={pendingInvites}
             />
-          </div>
+          )}
         </>
       ) : (
         /* No household yet */

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { logEventServer } from '@/lib/events-server'
 
 export async function createHousehold(formData: FormData) {
   const name = (formData.get('name') as string).trim()
@@ -17,8 +18,12 @@ export async function createHousehold(formData: FormData) {
     household_name: name,
   })
 
-  if (error) return { error: error.message }
+  if (error) {
+    await logEventServer('error.server', { message: error.message, action: 'createHousehold' })
+    return { error: error.message }
+  }
 
+  await logEventServer('household.created', { household_id: data })
   revalidatePath('/household')
   revalidatePath('/dashboard')
   return { success: true, household: data }

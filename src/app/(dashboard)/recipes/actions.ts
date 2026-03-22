@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { logEventServer } from '@/lib/events-server'
 
 export async function createRecipe(formData: FormData) {
   const supabase = await createClient()
@@ -31,7 +32,10 @@ export async function createRecipe(formData: FormData) {
     .select('id')
     .single()
 
-  if (error) return { error: error.message }
+  if (error) {
+    await logEventServer('error.server', { message: error.message, action: 'createRecipe' })
+    return { error: error.message }
+  }
 
   // Insert ingredients
   const ingredientNames = formData.getAll('ingredient_name') as string[]
@@ -51,5 +55,6 @@ export async function createRecipe(formData: FormData) {
     await supabase.from('recipe_ingredients').insert(ingredients)
   }
 
+  await logEventServer('recipe.created', { recipe_id: recipe.id })
   redirect(`/recipes/${recipe.id}`)
 }
