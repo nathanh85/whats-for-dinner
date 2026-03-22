@@ -98,6 +98,7 @@ export interface Database {
           created_by: string | null
           is_public: boolean
           created_at: string
+          recipe_category: string | null
         }
         Insert: {
           id?: string
@@ -112,6 +113,7 @@ export interface Database {
           created_by?: string | null
           is_public?: boolean
           created_at?: string
+          recipe_category?: string | null
         }
         Update: {
           id?: string
@@ -126,6 +128,7 @@ export interface Database {
           created_by?: string | null
           is_public?: boolean
           created_at?: string
+          recipe_category?: string | null
         }
         Relationships: []
       }

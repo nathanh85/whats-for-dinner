@@ -1,7 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { Clock, Users, ArrowLeft, BookOpen, ChefHat } from 'lucide-react'
+import { Clock, Users, ArrowLeft, ChefHat } from 'lucide-react'
+import RecipePlaceholder from '@/components/recipes/RecipePlaceholder'
 
 export default async function RecipeDetailPage({
   params,
@@ -41,9 +42,11 @@ export default async function RecipeDetailPage({
 
       {/* Header */}
       <div className="card mb-6">
-        <div className="mb-4 flex h-40 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-amber-100">
-          <BookOpen className="h-12 w-12 text-brand-300" />
-        </div>
+        <RecipePlaceholder
+          category={recipe.recipe_category}
+          iconSize="lg"
+          className="mb-4 h-40 rounded-xl"
+        />
 
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold text-stone-900">{recipe.title}</h1>

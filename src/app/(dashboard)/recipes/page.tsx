@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { Plus, Clock, Users, BookOpen } from 'lucide-react'
 import RecipeSearch from '@/components/recipes/RecipeSearch'
+import RecipePlaceholder from '@/components/recipes/RecipePlaceholder'
 
 export default async function RecipesPage({
   searchParams,
@@ -13,7 +14,7 @@ export default async function RecipesPage({
 
   let query = supabase
     .from('recipes')
-    .select('id, title, description, prep_time, cook_time, servings, source, created_by')
+    .select('id, title, description, prep_time, cook_time, servings, source, created_by, recipe_category')
     .order('created_at', { ascending: false })
 
   if (q) {
@@ -51,10 +52,10 @@ export default async function RecipesPage({
               href={`/recipes/${recipe.id}`}
               className="card group flex flex-col transition-shadow hover:shadow-md"
             >
-              {/* Placeholder image area */}
-              <div className="mb-4 flex h-32 items-center justify-center rounded-lg bg-gradient-to-br from-orange-50 to-amber-100">
-                <BookOpen className="h-8 w-8 text-brand-300" />
-              </div>
+              <RecipePlaceholder
+                category={recipe.recipe_category}
+                className="mb-4 h-32"
+              />
 
               <h3 className="font-semibold text-stone-900 group-hover:text-brand-600 transition-colors">
                 {recipe.title}
