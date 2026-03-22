@@ -71,21 +71,21 @@ export default function AddManagedProfileModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-surface-raised p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-stone-900">Add household member</h3>
-          <button onClick={() => setOpen(false)} className="text-stone-400 hover:text-stone-600">
+          <h3 className="font-semibold text-stone-900 dark:text-dt-primary">Add household member</h3>
+          <button onClick={() => setOpen(false)} className="text-stone-400 dark:text-dt-muted hover:text-stone-600 dark:hover:text-dt-secondary">
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        <p className="mb-4 text-sm text-stone-500">
+        <p className="mb-4 text-sm text-stone-500 dark:text-dt-muted">
           Add someone who doesn&apos;t need their own account (kids, family members, etc.)
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="mp-name" className="mb-1.5 block text-sm font-medium text-stone-700">
+            <label htmlFor="mp-name" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
               Display name
             </label>
             <input
@@ -100,7 +100,7 @@ export default function AddManagedProfileModal() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
               Avatar color
             </label>
             <div className="flex gap-2">
@@ -119,7 +119,7 @@ export default function AddManagedProfileModal() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
               Dietary restrictions
             </label>
             <div className="flex flex-wrap gap-2">
@@ -131,7 +131,7 @@ export default function AddManagedProfileModal() {
                   className={`rounded-full px-3 py-1 text-xs font-medium transition ${
                     dietary.includes(item)
                       ? 'bg-brand-100 text-brand-700'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                      : 'bg-stone-100 dark:bg-surface-hover text-stone-600 dark:text-dt-secondary hover:bg-stone-200 dark:hover:bg-surface-hover'
                   }`}
                 >
                   {item}
@@ -141,7 +141,7 @@ export default function AddManagedProfileModal() {
           </div>
 
           {error && (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+            <p className="rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
           )}
 
           <button type="submit" disabled={loading} className="btn-primary w-full">

@@ -1,14 +1,14 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, Trash2, Loader2, ShoppingCart, Sparkles, Check } from 'lucide-react'
+import { Plus, Trash2, Loader2, ShoppingCart, Sparkles, Check, ChevronDown } from 'lucide-react'
 import {
   addShoppingItem,
   toggleShoppingItem,
   deleteShoppingItem,
   clearCheckedItems,
-  generateFromMealPlan,
 } from '@/app/(dashboard)/shopping/actions'
+import GroceryListBuilder from './GroceryListBuilder'
 
 type ShoppingItem = {
   id: string
@@ -25,16 +25,33 @@ type Props = {
   householdId: string
 }
 
+const CATEGORY_ORDER = ['Proteins', 'Dairy', 'Produce', 'Pantry', 'Bread', 'Spices', 'Frozen', 'Other']
+
+function sortCategories(cats: string[]) {
+  return cats.sort((a, b) => {
+    const ai = CATEGORY_ORDER.indexOf(a)
+    const bi = CATEGORY_ORDER.indexOf(b)
+    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
+  })
+}
+
 export default function ShoppingList({ items, householdId }: Props) {
   const [quickAdd, setQuickAdd] = useState('')
-  const [generateMsg, setGenerateMsg] = useState<string | null>(null)
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [isAdding, startAddTransition] = useTransition()
-  const [isGenerating, startGenerateTransition] = useTransition()
   const [isClearing, startClearTransition] = useTransition()
 
   const unchecked = items.filter(i => !i.is_checked)
   const checked = items.filter(i => i.is_checked)
+
+  // Group unchecked by category
+  const groupedUnchecked = unchecked.reduce<Record<string, ShoppingItem[]>>((acc, item) => {
+    const cat = item.category ?? 'Other'
+    if (!acc[cat]) acc[cat] = []
+    acc[cat].push(item)
+    return acc
+  }, {})
+  const uncheckedCategories = sortCategories(Object.keys(groupedUnchecked))
 
   function handleQuickAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -71,18 +88,6 @@ export default function ShoppingList({ items, householdId }: Props) {
     })
   }
 
-  function handleGenerate() {
-    setGenerateMsg(null)
-    startGenerateTransition(async () => {
-      const result = await generateFromMealPlan(householdId)
-      if (result.error) {
-        setGenerateMsg(result.error)
-      } else {
-        setGenerateMsg(`Added ${result.added} ingredient${result.added !== 1 ? 's' : ''} from this week's meal plan`)
-      }
-    })
-  }
-
   return (
     <div className="space-y-6">
       {/* Quick add */}
@@ -104,33 +109,8 @@ export default function ShoppingList({ items, householdId }: Props) {
         </button>
       </form>
 
-      {/* Generate from meal plan */}
-      <div className="rounded-xl border border-olive/20 bg-olive/5 p-4 dark:border-accent/20 dark:bg-accent/5">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium text-stone-800 dark:text-dt-primary">Generate from meal plan</p>
-            <p className="mt-0.5 text-xs text-stone-500 dark:text-dt-muted">
-              Add missing ingredients from this week&apos;s planned meals.
-            </p>
-            {generateMsg && (
-              <p className={`mt-1.5 text-xs font-medium ${generateMsg.startsWith('Added') ? 'text-olive dark:text-accent' : 'text-amber-600 dark:text-amber-400'}`}>
-                {generateMsg}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerating}
-            className="btn-primary shrink-0 text-xs"
-          >
-            {isGenerating
-              ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              : <Sparkles className="h-3.5 w-3.5" />
-            }
-            Generate
-          </button>
-        </div>
-      </div>
+      {/* Grocery list builder */}
+      <GroceryListBuilder householdId={householdId} />
 
       {/* Empty state */}
       {items.length === 0 && (
@@ -138,25 +118,36 @@ export default function ShoppingList({ items, householdId }: Props) {
           <ShoppingCart className="mx-auto h-8 w-8 text-stone-300 dark:text-dt-muted" />
           <p className="mt-3 text-sm font-medium text-stone-500 dark:text-dt-secondary">Your list is empty</p>
           <p className="mt-1 text-xs text-stone-400 dark:text-dt-muted">
-            Quick-add items above or generate from this week&apos;s meal plan
+            Quick-add items above or generate from your meal plan
           </p>
         </div>
       )}
 
-      {/* Unchecked items */}
-      {unchecked.length > 0 && (
-        <div className="card p-0 overflow-hidden">
-          <ul className="divide-y divide-stone-100 dark:divide-surface-border">
-            {unchecked.map(item => (
-              <ShoppingItemRow
-                key={item.id}
-                item={item}
-                isPending={pendingId === item.id}
-                onToggle={() => handleToggle(item)}
-                onDelete={() => handleDelete(item.id)}
-              />
-            ))}
-          </ul>
+      {/* Unchecked items grouped by category */}
+      {uncheckedCategories.length > 0 && (
+        <div className="space-y-4">
+          {uncheckedCategories.map(cat => (
+            <div key={cat}>
+              <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">
+                {cat}
+              </h3>
+              <div className="card p-0 overflow-hidden">
+                <ul className="divide-y divide-stone-100 dark:divide-surface-border">
+                  {groupedUnchecked[cat]
+                    .sort((a, b) => a.ingredient_name.localeCompare(b.ingredient_name))
+                    .map(item => (
+                      <ShoppingItemRow
+                        key={item.id}
+                        item={item}
+                        isPending={pendingId === item.id}
+                        onToggle={() => handleToggle(item)}
+                        onDelete={() => handleDelete(item.id)}
+                      />
+                    ))}
+                </ul>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
@@ -165,7 +156,7 @@ export default function ShoppingList({ items, householdId }: Props) {
         <div>
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">
-              In cart ({checked.length})
+              Done ({checked.length})
             </h3>
             <button
               onClick={handleClearChecked}
@@ -211,21 +202,25 @@ function ShoppingItemRow({
 }) {
   return (
     <li className="flex items-center gap-3 px-4 py-3">
-      {/* Checkbox */}
+      {/* Checkbox — 44px touch target */}
       <button
         onClick={onToggle}
         disabled={isPending}
-        className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
-          item.is_checked
-            ? 'border-olive bg-olive text-white dark:border-accent dark:bg-accent dark:text-surface'
-            : 'border-stone-300 hover:border-olive dark:border-dt-muted dark:hover:border-accent'
+        className={`flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-lg transition-colors ${
+          item.is_checked ? '' : 'hover:bg-stone-50 dark:hover:bg-surface-hover'
         }`}
         aria-label={item.is_checked ? 'Uncheck item' : 'Check item'}
       >
-        {isPending
-          ? <Loader2 className="h-3 w-3 animate-spin" />
-          : item.is_checked && <Check className="h-3 w-3" />
-        }
+        <span className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+          item.is_checked
+            ? 'border-olive bg-olive text-white dark:border-accent dark:bg-accent dark:text-surface'
+            : 'border-stone-300 dark:border-dt-muted'
+        }`}>
+          {isPending
+            ? <Loader2 className="h-3 w-3 animate-spin" />
+            : item.is_checked && <Check className="h-3 w-3" />
+          }
+        </span>
       </button>
 
       {/* Name + meta */}
@@ -250,7 +245,7 @@ function ShoppingItemRow({
       <button
         onClick={onDelete}
         disabled={isPending}
-        className="ml-1 rounded-lg p-1.5 text-stone-300 hover:bg-red-50 hover:text-red-400 transition-colors disabled:opacity-40 dark:text-dt-muted dark:hover:bg-red-900/30 dark:hover:text-red-400"
+        className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-lg text-stone-300 hover:bg-red-50 hover:text-red-400 transition-colors disabled:opacity-40 dark:text-dt-muted dark:hover:bg-red-900/30 dark:hover:text-red-400"
         aria-label="Delete item"
       >
         <Trash2 className="h-4 w-4" />

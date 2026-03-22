@@ -450,6 +450,30 @@ export interface Database {
         }
         Relationships: []
       }
+      ingredient_categories: {
+        Row: {
+          id: string
+          ingredient_pattern: string
+          category: string
+          priority: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          ingredient_pattern: string
+          category: string
+          priority?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          ingredient_pattern?: string
+          category?: string
+          priority?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -481,6 +505,21 @@ export interface Database {
         }
         Returns: string
       }
+      generate_grocery_list: {
+        Args: {
+          p_household_id: string
+          p_start_date: string
+          p_end_date: string
+        }
+        Returns: {
+          ingredient_name: string
+          total_quantity: number
+          unit: string | null
+          category: string
+          recipe_sources: string
+          already_have: boolean
+        }[]
+      }
     }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -510,3 +549,13 @@ export type AppEvent          = Database['public']['Tables']['app_events']['Row'
 export type IngredientSynonym = Database['public']['Tables']['ingredient_synonyms']['Row']
 export type RecipeVariant     = Database['public']['Tables']['recipe_variants']['Row']
 export type RecipeVariantIngredient = Database['public']['Tables']['recipe_variant_ingredients']['Row']
+export type IngredientCategory = Database['public']['Tables']['ingredient_categories']['Row']
+
+export interface GroceryListItem {
+  ingredient_name: string
+  total_quantity: number
+  unit: string | null
+  category: string
+  recipe_sources: string
+  already_have: boolean
+}

@@ -76,10 +76,10 @@ export default async function HouseholdPage() {
           <div className="card mb-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-lg font-semibold text-stone-900">{household.name}</h2>
-                <p className="text-sm text-stone-500">
+                <h2 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">{household.name}</h2>
+                <p className="text-sm text-stone-500 dark:text-dt-muted">
                   Your role:{' '}
-                  <span className="font-medium text-stone-700">
+                  <span className="font-medium text-stone-700 dark:text-dt-secondary">
                     {currentMember ? roleLabel[currentMember.role as 'admin' | 'member'] : '—'}
                   </span>
                 </p>
@@ -94,16 +94,16 @@ export default async function HouseholdPage() {
           {/* Members list */}
           <div className="card mb-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-semibold text-stone-900">
+              <h3 className="font-semibold text-stone-900 dark:text-dt-primary">
                 Members{' '}
-                <span className="ml-1 text-sm font-normal text-stone-400">
+                <span className="ml-1 text-sm font-normal text-stone-400 dark:text-dt-muted">
                   ({members.length + managedProfiles.length})
                 </span>
               </h3>
               {isAdmin && <AddManagedProfileModal />}
             </div>
 
-            <ul className="divide-y divide-stone-100">
+            <ul className="divide-y divide-stone-100 dark:divide-surface-border">
               {/* Auth members */}
               {members.map((member) => {
                 const memberProfile = member.profiles as unknown as
@@ -122,15 +122,15 @@ export default async function HouseholdPage() {
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-stone-900">
+                      <p className="truncate text-sm font-medium text-stone-900 dark:text-dt-primary">
                         {memberProfile?.display_name ?? 'Unknown'}
                         {isYou && (
-                          <span className="ml-2 text-xs font-normal text-stone-400">you</span>
+                          <span className="ml-2 text-xs font-normal text-stone-400 dark:text-dt-muted">you</span>
                         )}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-stone-400">
+                    <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-dt-muted">
                       <RoleIcon className="h-3.5 w-3.5" />
                       {roleLabel[member.role as 'admin' | 'member']}
                     </div>
@@ -149,17 +149,17 @@ export default async function HouseholdPage() {
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-stone-900">
+                    <p className="truncate text-sm font-medium text-stone-900 dark:text-dt-primary">
                       {mp.display_name}
                     </p>
                     {mp.dietary_restrictions?.length > 0 && (
-                      <p className="truncate text-xs text-stone-400">
+                      <p className="truncate text-xs text-stone-400 dark:text-dt-muted">
                         {mp.dietary_restrictions.join(', ')}
                       </p>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs text-stone-400">
+                  <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-dt-muted">
                     <UserCheck className="h-3.5 w-3.5" />
                     Managed
                   </div>
@@ -179,11 +179,11 @@ export default async function HouseholdPage() {
       ) : (
         /* No household yet */
         <div className="card flex flex-col items-center justify-center py-20 text-center">
-          <div className="mb-4 rounded-2xl bg-green-50 p-5">
+          <div className="mb-4 rounded-2xl bg-green-50 dark:bg-green-900/30 p-5">
             <Users className="h-10 w-10 text-green-400" />
           </div>
-          <h3 className="text-lg font-semibold text-stone-900">No household yet</h3>
-          <p className="mt-1 max-w-xs text-sm text-stone-500">
+          <h3 className="text-lg font-semibold text-stone-900 dark:text-dt-primary">No household yet</h3>
+          <p className="mt-1 max-w-xs text-sm text-stone-500 dark:text-dt-muted">
             Create a household to start planning meals with your family or housemates.
           </p>
           <div className="mt-6 flex items-center gap-3">

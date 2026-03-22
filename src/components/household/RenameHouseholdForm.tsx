@@ -63,7 +63,7 @@ export default function RenameHouseholdForm({
       >
         <X className="h-3.5 w-3.5" />
       </button>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 dark:text-red-400">{error}</p>}
     </form>
   )
 }

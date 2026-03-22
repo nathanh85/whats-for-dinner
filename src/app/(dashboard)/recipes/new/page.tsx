@@ -7,7 +7,7 @@ export default function NewRecipePage() {
     <div className="mx-auto max-w-2xl">
       <Link
         href="/recipes"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-900"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-stone-500 dark:text-dt-muted hover:text-stone-900 dark:hover:text-dt-primary"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to recipes

@@ -44,17 +44,17 @@ export default function NewRecipeForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic info */}
       <div className="card space-y-4">
-        <h2 className="font-semibold text-stone-900">Details</h2>
+        <h2 className="font-semibold text-stone-900 dark:text-dt-primary">Details</h2>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-stone-700">
+          <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
             Title <span className="text-red-400">*</span>
           </label>
           <input name="title" type="text" required className="input" placeholder="e.g. Chicken Stir Fry" />
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-stone-700">Description</label>
+          <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Description</label>
           <textarea
             name="description"
             rows={2}
@@ -65,15 +65,15 @@ export default function NewRecipeForm() {
 
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">Prep (min)</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Prep (min)</label>
             <input name="prep_time" type="number" min={0} className="input" placeholder="10" />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">Cook (min)</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Cook (min)</label>
             <input name="cook_time" type="number" min={0} className="input" placeholder="30" />
           </div>
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-stone-700">Servings</label>
+            <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">Servings</label>
             <input name="servings" type="number" min={1} defaultValue={4} className="input" />
           </div>
         </div>
@@ -85,9 +85,9 @@ export default function NewRecipeForm() {
             type="checkbox"
             value="true"
             defaultChecked
-            className="h-4 w-4 rounded border-stone-300 text-brand-500 focus:ring-brand-400"
+            className="h-4 w-4 rounded border-stone-300 dark:border-surface-border text-brand-500 focus:ring-brand-400"
           />
-          <label htmlFor="is_public" className="text-sm text-stone-700">
+          <label htmlFor="is_public" className="text-sm text-stone-700 dark:text-dt-secondary">
             Make this recipe public
           </label>
         </div>
@@ -95,7 +95,7 @@ export default function NewRecipeForm() {
 
       {/* Ingredients */}
       <div className="card space-y-3">
-        <h2 className="font-semibold text-stone-900">Ingredients</h2>
+        <h2 className="font-semibold text-stone-900 dark:text-dt-primary">Ingredients</h2>
 
         {ingredients.map((ing, idx) => (
           <div key={ing.id} className="flex items-center gap-2">
@@ -123,7 +123,7 @@ export default function NewRecipeForm() {
               <button
                 type="button"
                 onClick={() => removeIngredient(ing.id)}
-                className="rounded-lg p-1.5 text-stone-400 hover:bg-red-50 hover:text-red-500"
+                className="rounded-lg p-1.5 text-stone-400 dark:text-dt-muted hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-500 dark:hover:text-red-400"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -143,18 +143,18 @@ export default function NewRecipeForm() {
 
       {/* Instructions */}
       <div className="card">
-        <h2 className="mb-3 font-semibold text-stone-900">Instructions</h2>
+        <h2 className="mb-3 font-semibold text-stone-900 dark:text-dt-primary">Instructions</h2>
         <textarea
           name="instructions"
           rows={8}
           className="input resize-none"
           placeholder="Enter each step on a new line…"
         />
-        <p className="mt-1.5 text-xs text-stone-400">Each line will become a numbered step.</p>
+        <p className="mt-1.5 text-xs text-stone-400 dark:text-dt-muted">Each line will become a numbered step.</p>
       </div>
 
       {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+        <p className="rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
       <div className="flex items-center justify-end gap-3">

@@ -3,22 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { logEventServer } from '@/lib/events-server'
-
-// Helper: Monday of the current week
-function getWeekRange() {
-  const today = new Date()
-  const day = today.getDay()
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1)
-  const monday = new Date(today)
-  monday.setDate(diff)
-  monday.setHours(0, 0, 0, 0)
-  const sunday = new Date(monday)
-  sunday.setDate(monday.getDate() + 6)
-  return {
-    start: monday.toISOString().split('T')[0],
-    end: sunday.toISOString().split('T')[0],
-  }
-}
+import type { GroceryListItem } from '@/types/database'
 
 export async function addShoppingItem(formData: FormData) {
   const supabase = await createClient()
@@ -35,7 +20,6 @@ export async function addShoppingItem(formData: FormData) {
   const unit = (formData.get('unit') as string)?.trim() || null
   const category = (formData.get('category') as string)?.trim() || null
 
-  // Get profile id for added_by
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
@@ -107,70 +91,51 @@ export async function clearCheckedItems(householdId: string) {
   return { success: true }
 }
 
-export async function generateFromMealPlan(householdId: string) {
+export async function generateGroceryList(householdId: string, startDate: string, endDate: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated', items: [] as GroceryListItem[] }
+
+  const { data, error } = await supabase.rpc('generate_grocery_list', {
+    p_household_id: householdId,
+    p_start_date: startDate,
+    p_end_date: endDate,
+  })
+
+  if (error) return { error: error.message, items: [] as GroceryListItem[] }
+  if (!data || data.length === 0) return { error: 'No recipes with ingredients found for this date range', items: [] as GroceryListItem[] }
+
+  return { items: data as GroceryListItem[] }
+}
+
+export async function addToShoppingList(
+  householdId: string,
+  items: { ingredient_name: string; quantity: number; unit: string | null; category: string }[]
+) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  const { start, end } = getWeekRange()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
 
-  // Get this week's meal plans that have a recipe
-  const { data: plans, error: plansError } = await supabase
-    .from('meal_plans')
-    .select('recipe_id, servings')
-    .eq('household_id', householdId)
-    .gte('date', start)
-    .lte('date', end)
-    .not('recipe_id', 'is', null)
+  const toInsert = items.map(item => ({
+    household_id: householdId,
+    ingredient_name: item.ingredient_name,
+    quantity: item.quantity,
+    unit: item.unit,
+    category: item.category,
+    source: 'meal_plan' as const,
+    is_checked: false,
+    added_by: profile?.id ?? null,
+  }))
 
-  if (plansError) return { error: plansError.message }
-  if (!plans || plans.length === 0) return { error: 'No recipes planned this week' }
+  const { error } = await supabase.from('shopping_items').insert(toInsert)
 
-  const recipeIds = Array.from(new Set(plans.map(p => p.recipe_id!)))
-
-  // Get all ingredients for those recipes
-  const { data: ingredients, error: ingError } = await supabase
-    .from('recipe_ingredients')
-    .select('recipe_id, ingredient_name, quantity, unit')
-    .in('recipe_id', recipeIds)
-
-  if (ingError) return { error: ingError.message }
-  if (!ingredients || ingredients.length === 0) {
-    return { error: 'No ingredients found for this week\'s recipes' }
-  }
-
-  // Get existing shopping items to avoid duplicates
-  const { data: existing } = await supabase
-    .from('shopping_items')
-    .select('ingredient_name')
-    .eq('household_id', householdId)
-    .eq('is_checked', false)
-
-  const existingNames = new Set(
-    (existing ?? []).map(i => i.ingredient_name.toLowerCase().trim())
-  )
-
-  // Build insert list — skip already-on-list items
-  const toInsert = ingredients
-    .filter(ing => !existingNames.has(ing.ingredient_name.toLowerCase().trim()))
-    .map(ing => ({
-      household_id: householdId,
-      ingredient_name: ing.ingredient_name,
-      quantity: ing.quantity ?? 1,
-      unit: ing.unit ?? null,
-      source: 'meal_plan' as const,
-      is_checked: false,
-    }))
-
-  if (toInsert.length === 0) {
-    return { error: 'All ingredients are already on your list' }
-  }
-
-  const { error: insertError } = await supabase
-    .from('shopping_items')
-    .insert(toInsert)
-
-  if (insertError) return { error: insertError.message }
+  if (error) return { error: error.message }
 
   await logEventServer('shopping.generated', { items_added: toInsert.length })
   revalidatePath('/shopping')

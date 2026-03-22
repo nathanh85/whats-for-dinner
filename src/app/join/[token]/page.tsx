@@ -91,7 +91,7 @@ export default function JoinPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 p-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-surface dark:via-surface dark:to-surface p-4">
         <Loader2 className="h-8 w-8 animate-spin text-brand-500" />
       </div>
     )
@@ -100,13 +100,13 @@ export default function JoinPage() {
   // Invalid / expired token
   if (!invite?.valid) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 p-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-surface dark:via-surface dark:to-surface p-4">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100">
-            <XCircle className="h-8 w-8 text-red-500" />
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-900/30">
+            <XCircle className="h-8 w-8 text-red-500 dark:text-red-400" />
           </div>
-          <h1 className="text-xl font-bold text-stone-900">Invalid or expired invite</h1>
-          <p className="mt-2 text-sm text-stone-500">
+          <h1 className="text-xl font-bold text-stone-900 dark:text-dt-primary">Invalid or expired invite</h1>
+          <p className="mt-2 text-sm text-stone-500 dark:text-dt-muted">
             This invite link is no longer valid. Ask your household admin for a new one.
           </p>
           <button
@@ -123,44 +123,44 @@ export default function JoinPage() {
   // Success state
   if (accepted) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 p-4">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-surface dark:via-surface dark:to-surface p-4">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 dark:bg-green-900/30">
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           </div>
-          <h1 className="text-xl font-bold text-stone-900">
+          <h1 className="text-xl font-bold text-stone-900 dark:text-dt-primary">
             Welcome to {invite.household_name}!
           </h1>
-          <p className="mt-2 text-sm text-stone-500">Redirecting to your dashboard...</p>
+          <p className="mt-2 text-sm text-stone-500 dark:text-dt-muted">Redirecting to your dashboard...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-surface dark:via-surface dark:to-surface p-4">
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 shadow-lg">
             <span className="text-2xl">🍽️</span>
           </div>
-          <h1 className="text-2xl font-bold text-stone-900">What&apos;s for Dinner?</h1>
-          <p className="mt-1 text-sm text-stone-500">
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-dt-primary">What&apos;s for Dinner?</h1>
+          <p className="mt-1 text-sm text-stone-500 dark:text-dt-muted">
             You&apos;ve been invited to join{' '}
-            <span className="font-semibold text-stone-700">{invite.household_name}</span>
+            <span className="font-semibold text-stone-700 dark:text-dt-secondary">{invite.household_name}</span>
           </p>
         </div>
 
         <div className="card">
           {/* Mode toggle */}
-          <div className="mb-6 flex rounded-lg bg-stone-100 p-1">
+          <div className="mb-6 flex rounded-lg bg-stone-100 dark:bg-surface-hover p-1">
             <button
               onClick={() => setMode('signup')}
               className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
                 mode === 'signup'
-                  ? 'bg-white text-stone-900 shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-white dark:bg-surface-raised text-stone-900 dark:text-dt-primary shadow-sm'
+                  : 'text-stone-500 dark:text-dt-muted hover:text-stone-700 dark:hover:text-dt-secondary'
               }`}
             >
               Create account
@@ -169,8 +169,8 @@ export default function JoinPage() {
               onClick={() => setMode('signin')}
               className={`flex-1 rounded-md py-2 text-sm font-medium transition ${
                 mode === 'signin'
-                  ? 'bg-white text-stone-900 shadow-sm'
-                  : 'text-stone-500 hover:text-stone-700'
+                  ? 'bg-white dark:bg-surface-raised text-stone-900 dark:text-dt-primary shadow-sm'
+                  : 'text-stone-500 dark:text-dt-muted hover:text-stone-700 dark:hover:text-dt-secondary'
               }`}
             >
               Sign in
@@ -180,7 +180,7 @@ export default function JoinPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <div>
-                <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-stone-700">
+                <label htmlFor="displayName" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
                   Display name
                 </label>
                 <input
@@ -197,7 +197,7 @@ export default function JoinPage() {
             )}
 
             <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-stone-700">
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
                 Email address
               </label>
               <input
@@ -213,7 +213,7 @@ export default function JoinPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-stone-700">
+              <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-dt-secondary">
                 Password
               </label>
               <input
@@ -230,7 +230,7 @@ export default function JoinPage() {
             </div>
 
             {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+              <p className="rounded-lg bg-red-50 dark:bg-red-900/30 px-3 py-2 text-sm text-red-600 dark:text-red-400">{error}</p>
             )}
 
             <button type="submit" disabled={submitting} className="btn-primary w-full">
