@@ -4,6 +4,7 @@ import CreateHouseholdModal from '@/components/household/CreateHouseholdModal'
 import RenameHouseholdForm from '@/components/household/RenameHouseholdForm'
 import InviteSection from '@/components/household/InviteSection'
 import AddManagedProfileModal from '@/components/household/AddManagedProfileModal'
+import MemberActions from '@/components/household/MemberActions'
 
 const roleLabel = { admin: 'Admin', member: 'Member' } as const
 
@@ -62,6 +63,9 @@ export default async function HouseholdPage() {
 
   const currentMember = myMembership ?? members.find((m) => m.user_id === user!.id)
   const isAdmin = currentMember?.role === 'admin'
+  const currentUserRole: 'admin' | 'member' = isAdmin ? 'admin' : 'member'
+  const currentUserId = user!.id
+  const adminCount = members.filter((m) => m.role === 'admin').length
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -134,6 +138,18 @@ export default async function HouseholdPage() {
                       <RoleIcon className="h-3.5 w-3.5" />
                       {roleLabel[member.role as 'admin' | 'member']}
                     </div>
+
+                    {!isYou && (
+                      <MemberActions
+                        type="auth-member"
+                        targetId={member.id}
+                        targetName={memberProfile?.display_name ?? 'Unknown'}
+                        householdName={household.name}
+                        householdId={household.id}
+                        isOnlyAdmin={false}
+                        currentUserRole={currentUserRole}
+                      />
+                    )}
                   </li>
                 )
               })}
@@ -163,9 +179,33 @@ export default async function HouseholdPage() {
                     <UserCheck className="h-3.5 w-3.5" />
                     Managed
                   </div>
+
+                  <MemberActions
+                    type="managed-profile"
+                    targetId={mp.id}
+                    targetName={mp.display_name}
+                    householdName={household.name}
+                    householdId={household.id}
+                    isOnlyAdmin={false}
+                    currentUserRole={currentUserRole}
+                  />
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Leave household */}
+          <div className="card mb-6">
+            <h3 className="mb-3 font-semibold text-stone-900 dark:text-dt-primary">Danger zone</h3>
+            <MemberActions
+              type="leave"
+              targetId={household.id}
+              targetName={profile?.display_name ?? 'You'}
+              householdName={household.name}
+              householdId={household.id}
+              isOnlyAdmin={currentUserRole === 'admin' && adminCount <= 1}
+              currentUserRole={currentUserRole}
+            />
           </div>
 
           {/* Invite section */}

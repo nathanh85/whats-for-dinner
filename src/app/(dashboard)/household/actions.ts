@@ -45,3 +45,75 @@ export async function renameHousehold(formData: FormData) {
   revalidatePath('/household')
   return { success: true }
 }
+
+export async function removeMember(memberId: string, householdId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('household_members')
+    .delete()
+    .eq('id', memberId)
+    .eq('household_id', householdId)
+
+  if (error) {
+    await logEventServer('error.server', { message: error.message, action: 'removeMember' })
+    return { error: error.message }
+  }
+
+  await logEventServer('household.member_removed', { member_id: memberId, household_id: householdId })
+  revalidatePath('/household')
+  return { success: true }
+}
+
+export async function removeManagedProfile(profileId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error } = await supabase
+    .from('profiles')
+    .delete()
+    .eq('id', profileId)
+
+  if (error) {
+    await logEventServer('error.server', { message: error.message, action: 'removeManagedProfile' })
+    return { error: error.message }
+  }
+
+  await logEventServer('managed_profile.removed', { profile_id: profileId })
+  revalidatePath('/household')
+  return { success: true }
+}
+
+export async function leaveHousehold(householdId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { error: memberError } = await supabase
+    .from('household_members')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('household_id', householdId)
+
+  if (memberError) {
+    await logEventServer('error.server', { message: memberError.message, action: 'leaveHousehold' })
+    return { error: memberError.message }
+  }
+
+  const { error: profileError } = await supabase
+    .from('profiles')
+    .update({ household_id: null })
+    .eq('id', user.id)
+
+  if (profileError) {
+    await logEventServer('error.server', { message: profileError.message, action: 'leaveHousehold.profile' })
+    return { error: profileError.message }
+  }
+
+  await logEventServer('household.left', { household_id: householdId })
+  revalidatePath('/household')
+  return { success: true }
+}

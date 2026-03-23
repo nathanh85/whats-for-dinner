@@ -547,6 +547,18 @@ export interface Database {
           already_have: boolean
         }[]
       }
+      upsert_shopping_item: {
+        Args: {
+          p_household_id: string
+          p_ingredient_name: string
+          p_quantity: number
+          p_unit: string | null
+          p_category: string | null
+          p_added_by: string | null
+          p_source: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'

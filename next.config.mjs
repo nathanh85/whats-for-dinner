@@ -20,7 +20,7 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: 'X-App-Version', value: '1.3.0' },
+          { key: 'X-App-Version', value: '1.4.0' },
         ],
       },
     ]

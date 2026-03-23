@@ -237,7 +237,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 gap-2">
+      <div className="grid grid-cols-7 gap-3">
         {days.map((day) => {
           const isToday = day.date === today
           const isPast = day.date < today
@@ -245,18 +245,18 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
           return (
             <div
               key={day.date}
-              className={`flex min-h-[200px] flex-col rounded-xl border p-2 transition-colors ${
+              className={`flex min-h-[240px] flex-col rounded-xl border p-3 transition-colors ${
                 isToday
                   ? 'border-brand-400 bg-brand-50/60 shadow-sm dark:border-accent dark:bg-accent/10'
                   : 'border-stone-200 bg-white dark:border-surface-border dark:bg-surface-raised'
               } ${isPast ? 'opacity-60' : ''}`}
             >
               {/* Day header */}
-              <div className="mb-2 text-center">
-                <p className={`text-xs font-medium ${isToday ? 'text-brand-600 dark:text-accent' : 'text-stone-400 dark:text-dt-muted'}`}>
+              <div className="mb-3 text-center">
+                <p className={`text-sm font-semibold ${isToday ? 'text-brand-600 dark:text-accent' : 'text-stone-500 dark:text-dt-secondary'}`}>
                   {day.label}
                 </p>
-                <p className={`text-lg font-semibold leading-tight ${
+                <p className={`text-xl font-bold leading-tight ${
                   isToday ? 'text-brand-700 dark:text-accent' : 'text-stone-800 dark:text-dt-primary'
                 }`}>
                   {day.dayNum}
@@ -269,7 +269,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
               </div>
 
               {/* Meal slots */}
-              <div className="flex flex-1 flex-col gap-1.5">
+              <div className="flex flex-1 flex-col gap-2">
                 {MEAL_TYPES.map((mealType) => {
                   const meals = getMealsForDay(day.date, mealType)
 
@@ -278,11 +278,11 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                       {meals.map((meal) => (
                         <div
                           key={meal.id}
-                          className={`mb-1 flex items-start justify-between gap-1 rounded-lg border px-2 py-1.5 text-xs ${MEAL_COLORS[mealType]}`}
+                          className={`mb-1.5 flex items-start justify-between gap-1 rounded-lg border px-2.5 py-2 text-xs ${MEAL_COLORS[mealType]}`}
                         >
                           <button
                             onClick={() => openEditModal(meal, day.date, mealType)}
-                            className="min-w-0 flex-1 truncate text-left font-medium leading-tight hover:underline"
+                            className="min-w-0 flex-1 truncate text-left font-medium leading-snug hover:underline"
                           >
                             {getMealName(meal)}
                           </button>
@@ -303,7 +303,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
                       {householdId && (
                         <button
                           onClick={() => setModalState({ date: day.date, mealType })}
-                          className={`flex w-full items-center gap-1 rounded-md px-1.5 py-1 text-[10px] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-secondary ${
+                          className={`flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-[11px] text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-secondary ${
                             isToday ? 'opacity-100' : 'opacity-0 group-hover/slot:opacity-100'
                           }`}
                         >

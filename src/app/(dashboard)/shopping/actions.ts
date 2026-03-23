@@ -26,14 +26,14 @@ export async function addShoppingItem(formData: FormData) {
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const { error } = await supabase.from('shopping_items').insert({
-    household_id: householdId,
-    ingredient_name: ingredientName,
-    quantity,
-    unit,
-    category,
-    source: 'manual',
-    added_by: profile?.id ?? null,
+  const { error } = await supabase.rpc('upsert_shopping_item', {
+    p_household_id: householdId,
+    p_ingredient_name: ingredientName,
+    p_quantity: quantity,
+    p_unit: unit,
+    p_category: category,
+    p_added_by: profile?.id ?? null,
+    p_source: 'manual',
   })
 
   if (error) return { error: error.message }
@@ -122,22 +122,21 @@ export async function addToShoppingList(
     .eq('user_id', user.id)
     .maybeSingle()
 
-  const toInsert = items.map(item => ({
-    household_id: householdId,
-    ingredient_name: item.ingredient_name,
-    quantity: item.quantity,
-    unit: item.unit,
-    category: item.category,
-    source: 'meal_plan' as const,
-    is_checked: false,
-    added_by: profile?.id ?? null,
-  }))
+  // Use upsert RPC to merge quantities instead of creating duplicates
+  for (const item of items) {
+    const { error } = await supabase.rpc('upsert_shopping_item', {
+      p_household_id: householdId,
+      p_ingredient_name: item.ingredient_name,
+      p_quantity: item.quantity,
+      p_unit: item.unit,
+      p_category: item.category,
+      p_added_by: profile?.id ?? null,
+      p_source: 'meal_plan',
+    })
+    if (error) return { error: error.message }
+  }
 
-  const { error } = await supabase.from('shopping_items').insert(toInsert)
-
-  if (error) return { error: error.message }
-
-  await logEventServer('shopping.generated', { items_added: toInsert.length })
+  await logEventServer('shopping.generated', { items_added: items.length })
   revalidatePath('/shopping')
-  return { success: true, added: toInsert.length }
+  return { success: true, added: items.length }
 }
