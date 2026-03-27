@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { Plus, X, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, X, Loader2, ChevronLeft, ChevronRight, Wand2 } from 'lucide-react'
 import { removeMeal } from '@/app/(dashboard)/planner/actions'
 import AddMealModal, { type ExistingMeal } from './AddMealModal'
+import AutoPlanModal from './AutoPlanModal'
 
 type Day = {
   date: string
@@ -70,6 +71,7 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
     existingMeal?: ExistingMeal
   } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [showAutoPlan, setShowAutoPlan] = useState(false)
   const [, startTransition] = useTransition()
 
   function getMealsForDay(date: string, mealType: string) {
@@ -333,8 +335,27 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
     </div>
   )
 
+  const weekStart = days[0]?.date
+  const weekEnd = days[days.length - 1]?.date
+  const hasEmptySlots = days.some(day =>
+    MEAL_TYPES.some(type => getMealsForDay(day.date, type).length === 0)
+  )
+
   return (
     <>
+      {/* Auto-plan button */}
+      {householdId && hasEmptySlots && (
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => setShowAutoPlan(true)}
+            className="btn-secondary"
+          >
+            <Wand2 className="h-4 w-4" />
+            Auto-plan this week
+          </button>
+        </div>
+      )}
+
       <MobileDayView />
       <DesktopGrid />
 
@@ -347,6 +368,16 @@ export default function WeekGrid({ days, mealPlans, recipes, householdId, today 
           recipes={recipes}
           existingMeal={modalState.existingMeal}
           onClose={() => setModalState(null)}
+        />
+      )}
+
+      {/* Auto-plan modal */}
+      {showAutoPlan && householdId && (
+        <AutoPlanModal
+          householdId={householdId}
+          weekStart={weekStart}
+          weekEnd={weekEnd}
+          onClose={() => setShowAutoPlan(false)}
         />
       )}
     </>

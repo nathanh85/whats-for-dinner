@@ -96,6 +96,13 @@ export async function logAsCooked(recipeId: string) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
+  // Get household_id for pantry decrement
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('household_id')
+    .eq('id', user.id)
+    .maybeSingle()
+
   const { error } = await supabase.from('recipe_interactions').insert({
     user_id: user.id,
     recipe_id: recipeId,
@@ -104,6 +111,16 @@ export async function logAsCooked(recipeId: string) {
 
   if (error) return { error: error.message }
 
-  await logEventServer('recipe.cooked', { recipe_id: recipeId })
-  return { success: true }
+  // Decrement pantry stock for perishable ingredients
+  let decrements: { ingredient_name: string; old_stock_level: string; new_stock_level: string; updated: boolean }[] = []
+  if (profile?.household_id) {
+    const { data } = await supabase.rpc('decrement_pantry_on_cook', {
+      p_household_id: profile.household_id,
+      p_recipe_id: recipeId,
+    })
+    decrements = data ?? []
+  }
+
+  await logEventServer('recipe.cooked', { recipe_id: recipeId, decrements_count: decrements.length })
+  return { success: true, decrements }
 }

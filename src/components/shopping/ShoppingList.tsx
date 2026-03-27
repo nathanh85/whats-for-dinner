@@ -25,12 +25,13 @@ type Props = {
   householdId: string
 }
 
-const CATEGORY_ORDER = ['Proteins', 'Dairy', 'Produce', 'Pantry', 'Bread', 'Spices', 'Frozen', 'Other']
+const ALPHA_ORDER = ['Bread', 'Dairy', 'Frozen', 'Other', 'Pantry', 'Produce', 'Proteins', 'Spices']
+const AISLE_ORDER = ['Produce', 'Bread', 'Dairy', 'Proteins', 'Frozen', 'Pantry', 'Spices', 'Other']
 
-function sortCategories(cats: string[]) {
+function sortCategories(cats: string[], order: string[]) {
   return cats.sort((a, b) => {
-    const ai = CATEGORY_ORDER.indexOf(a)
-    const bi = CATEGORY_ORDER.indexOf(b)
+    const ai = order.indexOf(a)
+    const bi = order.indexOf(b)
     return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
   })
 }
@@ -40,6 +41,7 @@ export default function ShoppingList({ items, householdId }: Props) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [isAdding, startAddTransition] = useTransition()
   const [isClearing, startClearTransition] = useTransition()
+  const [sortMode, setSortMode] = useState<'alpha' | 'aisle'>('aisle')
 
   const unchecked = items.filter(i => !i.is_checked)
   const checked = items.filter(i => i.is_checked)
@@ -51,7 +53,10 @@ export default function ShoppingList({ items, householdId }: Props) {
     acc[cat].push(item)
     return acc
   }, {})
-  const uncheckedCategories = sortCategories(Object.keys(groupedUnchecked))
+  const uncheckedCategories = sortCategories(
+    Object.keys(groupedUnchecked),
+    sortMode === 'aisle' ? AISLE_ORDER : ALPHA_ORDER
+  )
 
   function handleQuickAdd(e: React.FormEvent) {
     e.preventDefault()
@@ -123,9 +128,25 @@ export default function ShoppingList({ items, householdId }: Props) {
         </div>
       )}
 
-      {/* Unchecked items grouped by category */}
+      {/* Sort toggle + Unchecked items grouped by category */}
       {uncheckedCategories.length > 0 && (
         <div className="space-y-4">
+          <div className="flex items-center justify-end gap-1">
+            <span className="mr-1.5 text-xs text-stone-400 dark:text-dt-muted">Sort:</span>
+            {(['alpha', 'aisle'] as const).map(mode => (
+              <button
+                key={mode}
+                onClick={() => setSortMode(mode)}
+                className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  sortMode === mode
+                    ? 'bg-brand-500 text-white dark:bg-accent dark:text-surface'
+                    : 'text-stone-500 hover:bg-stone-100 dark:text-dt-muted dark:hover:bg-surface-hover'
+                }`}
+              >
+                {mode === 'alpha' ? 'A-Z' : 'Aisle'}
+              </button>
+            ))}
+          </div>
           {uncheckedCategories.map(cat => (
             <div key={cat}>
               <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-dt-muted">

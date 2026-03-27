@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { ShoppingBasket, Lightbulb } from 'lucide-react'
+import { ShoppingBasket } from 'lucide-react'
 import PantryList from '@/components/pantry/PantryList'
+import PantryNudges from '@/components/pantry/PantryNudges'
+import type { PantryNudge } from '@/types/database'
 
 export default async function PantryPage() {
   const supabase = await createClient()
@@ -16,14 +18,19 @@ export default async function PantryPage() {
 
   const householdId = profile?.household_id ?? null
 
-  const { data: items } = householdId
-    ? await supabase
-        .from('pantry_items')
-        .select('id, ingredient_name, quantity, unit, category, expiry_date, low_stock_threshold, stock_level, meal_count, notes')
-        .eq('household_id', householdId)
-        .order('category', { nullsFirst: false })
-        .order('ingredient_name')
-    : { data: [] }
+  const [{ data: items }, { data: nudges }] = await Promise.all([
+    householdId
+      ? supabase
+          .from('pantry_items')
+          .select('id, ingredient_name, quantity, unit, category, expiry_date, low_stock_threshold, stock_level, meal_count, notes')
+          .eq('household_id', householdId)
+          .order('category', { nullsFirst: false })
+          .order('ingredient_name')
+      : Promise.resolve({ data: [] }),
+    householdId
+      ? supabase.rpc('get_pantry_nudges', { p_household_id: householdId, p_days_ahead: 7 })
+      : Promise.resolve({ data: [] }),
+  ])
 
   const totalItems = items?.length ?? 0
   const lowCount = items?.filter(i => i.stock_level === 'low' || i.stock_level === 'out').length ?? 0
@@ -52,19 +59,7 @@ export default async function PantryPage() {
         </div>
       ) : (
         <>
-          {/* Nudges stub */}
-          <div className="mb-6 rounded-xl border border-stone-200 bg-stone-50 px-4 py-3 dark:border-surface-border dark:bg-surface-raised">
-            <div className="flex items-start gap-3">
-              <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500 dark:text-amber-400" />
-              <div>
-                <p className="text-sm font-medium text-stone-700 dark:text-dt-secondary">Heads up</p>
-                <p className="mt-0.5 text-xs text-stone-500 dark:text-dt-muted">
-                  Nudges coming soon — we&apos;ll alert you when planned meals need ingredients you&apos;re running low on.
-                </p>
-              </div>
-            </div>
-          </div>
-
+          <PantryNudges nudges={(nudges ?? []) as PantryNudge[]} householdId={householdId} />
           <PantryList items={items ?? []} householdId={householdId} />
         </>
       )}

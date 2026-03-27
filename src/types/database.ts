@@ -559,6 +559,32 @@ export interface Database {
         }
         Returns: string
       }
+      get_pantry_nudges: {
+        Args: {
+          p_household_id: string
+          p_days_ahead?: number
+        }
+        Returns: {
+          ingredient_name: string
+          stock_level: string
+          meal_count: number | null
+          needed_for: string
+          planned_date: string
+          urgency: string
+        }[]
+      }
+      decrement_pantry_on_cook: {
+        Args: {
+          p_household_id: string
+          p_recipe_id: string
+        }
+        Returns: {
+          ingredient_name: string
+          old_stock_level: string
+          new_stock_level: string
+          updated: boolean
+        }[]
+      }
     }
     Enums: {
       meal_type: 'breakfast' | 'lunch' | 'dinner' | 'snack'
@@ -598,4 +624,20 @@ export interface GroceryListItem {
   category: string
   recipe_sources: string
   already_have: boolean
+}
+
+export interface PantryNudge {
+  ingredient_name: string
+  stock_level: string
+  meal_count: number | null
+  needed_for: string
+  planned_date: string
+  urgency: 'missing' | 'check'
+}
+
+export interface PantryDecrement {
+  ingredient_name: string
+  old_stock_level: string
+  new_stock_level: string
+  updated: boolean
 }

@@ -20,8 +20,16 @@ export default function RecipeActions({ recipeId, recipeTitle, defaultServings, 
     startTransition(async () => {
       const result = await logAsCooked(recipeId)
       if (result.success) {
-        setToast(`Logged! You cooked ${recipeTitle}`)
-        setTimeout(() => setToast(null), 3000)
+        const decrements = result.decrements ?? []
+        if (decrements.length > 0) {
+          const changes = decrements
+            .map(d => `${d.ingredient_name} (${d.old_stock_level} → ${d.new_stock_level})`)
+            .join(', ')
+          setToast(`Logged! Pantry updated: ${changes}`)
+        } else {
+          setToast(`Logged! You cooked ${recipeTitle}`)
+        }
+        setTimeout(() => setToast(null), 5000)
       }
     })
   }
