@@ -229,6 +229,7 @@ export default async function HouseholdPage() {
               householdId={household.id}
               householdName={household.name}
               initialInvites={pendingInvites}
+              isAppAdmin={profile?.is_app_admin ?? false}
             />
           )}
         </>

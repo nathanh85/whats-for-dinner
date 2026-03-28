@@ -36,6 +36,7 @@ export interface Database {
           avatar_color: string
           dietary_restrictions: string[]
           is_managed: boolean
+          is_app_admin: boolean
           created_at: string
         }
         Insert: {
@@ -46,6 +47,7 @@ export interface Database {
           avatar_color?: string
           dietary_restrictions?: string[]
           is_managed?: boolean
+          is_app_admin?: boolean
           created_at?: string
         }
         Update: {
@@ -56,6 +58,7 @@ export interface Database {
           avatar_color?: string
           dietary_restrictions?: string[]
           is_managed?: boolean
+          is_app_admin?: boolean
           created_at?: string
         }
         Relationships: []

@@ -66,10 +66,12 @@ export default function InviteSection({
   householdId,
   householdName,
   initialInvites,
+  isAppAdmin = false,
 }: {
   householdId: string
   householdName: string
   initialInvites: PendingInvite[]
+  isAppAdmin?: boolean
 }) {
   const router = useRouter()
   const [memberEmail, setMemberEmail] = useState('')
@@ -219,8 +221,8 @@ export default function InviteSection({
         )}
       </div>
 
-      {/* Section 2: Invite a new household */}
-      <div className="card mb-6">
+      {/* Section 2: Invite a new household (app admin only) */}
+      {isAppAdmin && <div className="card mb-6">
         <div className="mb-3 flex items-center gap-2">
           <Home className="h-4 w-4 text-teal-500" />
           <h3 className="font-semibold text-stone-900 dark:text-dt-primary">Invite a new household</h3>
@@ -259,7 +261,7 @@ export default function InviteSection({
             </ul>
           </>
         )}
-      </div>
+      </div>}
     </>
   )
 }
