@@ -10,6 +10,7 @@ type InviteInfo = {
   is_valid: boolean
   household_name: string | null
   email: string | null
+  invite_type: 'member' | 'household'
 }
 
 export default function JoinPage() {
@@ -35,7 +36,7 @@ export default function JoinPage() {
         p_token: token,
       })
       if (error || !data) {
-        setInvite({ is_valid: false, household_name: null, email: null })
+        setInvite({ is_valid: false, household_name: null, email: null, invite_type: 'member' })
       } else {
         // data could be a single object or array depending on RPC return
         const result = Array.isArray(data) ? data[0] : data
@@ -69,11 +70,20 @@ export default function JoinPage() {
         if (signInError) throw signInError
       }
 
-      // Accept the invite after auth
-      const { error: acceptError } = await supabase.rpc('accept_invite', {
-        p_token: token,
-      })
-      if (acceptError) throw acceptError
+      // Accept the invite after auth — use the right RPC based on invite type
+      if (invite?.invite_type === 'household') {
+        const { data: acceptData, error: acceptError } = await supabase.rpc('accept_household_invite', {
+          p_token: token,
+        })
+        if (acceptError) throw acceptError
+        const result = acceptData as unknown as { success: boolean; error?: string }
+        if (!result?.success) throw new Error(result?.error ?? 'Failed to accept invite')
+      } else {
+        const { error: acceptError } = await supabase.rpc('accept_invite', {
+          p_token: token,
+        })
+        if (acceptError) throw acceptError
+      }
 
       logEvent('invite.accepted', { token })
       setAccepted(true)
@@ -129,7 +139,9 @@ export default function JoinPage() {
             <CheckCircle2 className="h-8 w-8 text-green-500" />
           </div>
           <h1 className="text-xl font-bold text-stone-900 dark:text-dt-primary">
-            Welcome to {invite.household_name}!
+            {invite.invite_type === 'household'
+              ? 'Welcome to What\'s for Dinner!'
+              : `Welcome to ${invite.household_name}!`}
           </h1>
           <p className="mt-2 text-sm text-stone-500 dark:text-dt-muted">Redirecting to your dashboard...</p>
         </div>
@@ -146,10 +158,16 @@ export default function JoinPage() {
             <span className="text-2xl">🍽️</span>
           </div>
           <h1 className="text-2xl font-bold text-stone-900 dark:text-dt-primary">What&apos;s for Dinner?</h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-dt-muted">
-            You&apos;ve been invited to join{' '}
-            <span className="font-semibold text-stone-700 dark:text-dt-secondary">{invite.household_name}</span>
-          </p>
+          {invite.invite_type === 'household' ? (
+            <p className="mt-1 text-sm text-stone-500 dark:text-dt-muted">
+              You&apos;ve been invited to join! Create your account to get started with your own household.
+            </p>
+          ) : (
+            <p className="mt-1 text-sm text-stone-500 dark:text-dt-muted">
+              You&apos;ve been invited to join{' '}
+              <span className="font-semibold text-stone-700 dark:text-dt-secondary">{invite.household_name}</span>
+            </p>
+          )}
         </div>
 
         <div className="card">
@@ -235,7 +253,9 @@ export default function JoinPage() {
 
             <button type="submit" disabled={submitting} className="btn-primary w-full">
               {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {mode === 'signup' ? 'Join household' : 'Sign in & join'}
+              {invite.invite_type === 'household'
+                ? (mode === 'signup' ? 'Create account' : 'Sign in')
+                : (mode === 'signup' ? 'Join household' : 'Sign in & join')}
             </button>
           </form>
         </div>

@@ -40,16 +40,31 @@ export default async function HouseholdPage() {
         .then(({ data }) => data ?? [])
     : []
 
-  // Load pending invites
-  const pendingInvites = household
+  // Load pending member invites (tied to this household)
+  const pendingMemberInvites = household
     ? await supabase
         .from('household_invites')
-        .select('id, email, token, created_at, expires_at')
+        .select('id, email, token, invite_type, created_at, expires_at')
         .eq('household_id', household.id)
         .eq('status', 'pending')
+        .eq('invite_type', 'member')
         .order('created_at', { ascending: false })
         .then(({ data }) => data ?? [])
     : []
+
+  // Load pending household invites (created by this user, no household_id)
+  const pendingHouseholdInvites = user
+    ? await supabase
+        .from('household_invites')
+        .select('id, email, token, invite_type, created_at, expires_at')
+        .eq('invited_by', user.id)
+        .eq('status', 'pending')
+        .eq('invite_type', 'household')
+        .order('created_at', { ascending: false })
+        .then(({ data }) => data ?? [])
+    : []
+
+  const pendingInvites = [...pendingMemberInvites, ...pendingHouseholdInvites]
 
   // Query current user's role directly
   const { data: myMembership } = household
@@ -212,6 +227,7 @@ export default async function HouseholdPage() {
           {isAdmin && (
             <InviteSection
               householdId={household.id}
+              householdName={household.name}
               initialInvites={pendingInvites}
             />
           )}

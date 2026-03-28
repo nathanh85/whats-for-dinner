@@ -396,33 +396,39 @@ export interface Database {
       household_invites: {
         Row: {
           id: string
-          household_id: string
+          household_id: string | null
           invited_by: string
           email: string
           token: string
-          status: 'pending' | 'accepted' | 'expired'
+          status: 'pending' | 'accepted' | 'expired' | 'cancelled'
           expires_at: string
           created_at: string
+          accepted_at: string | null
+          invite_type: 'member' | 'household'
         }
         Insert: {
           id?: string
-          household_id: string
+          household_id?: string | null
           invited_by: string
           email: string
           token?: string
-          status?: 'pending' | 'accepted' | 'expired'
+          status?: 'pending' | 'accepted' | 'expired' | 'cancelled'
           expires_at?: string
           created_at?: string
+          accepted_at?: string | null
+          invite_type?: 'member' | 'household'
         }
         Update: {
           id?: string
-          household_id?: string
+          household_id?: string | null
           invited_by?: string
           email?: string
           token?: string
-          status?: 'pending' | 'accepted' | 'expired'
+          status?: 'pending' | 'accepted' | 'expired' | 'cancelled'
           expires_at?: string
           created_at?: string
+          accepted_at?: string | null
+          invite_type?: 'member' | 'household'
         }
         Relationships: []
       }
@@ -518,11 +524,28 @@ export interface Database {
       }
       validate_invite: {
         Args: { p_token: string }
-        Returns: { valid: boolean; household_name: string | null; email: string | null }
+        Returns: {
+          invite_id: string
+          household_id: string | null
+          household_name: string | null
+          email: string | null
+          status: string
+          expires_at: string
+          is_valid: boolean
+          invite_type: 'member' | 'household'
+        }
       }
       accept_invite: {
         Args: { p_token: string }
         Returns: void
+      }
+      create_household_invite: {
+        Args: { p_email: string }
+        Returns: Json
+      }
+      accept_household_invite: {
+        Args: { p_token: string }
+        Returns: Json
       }
       create_managed_profile: {
         Args: {
@@ -591,7 +614,8 @@ export interface Database {
       member_role: 'admin' | 'member'
       recipe_source: 'seeded' | 'user' | 'ai'
       shopping_source: 'manual' | 'meal_plan' | 'recommendation'
-      invite_status: 'pending' | 'accepted' | 'expired'
+      invite_status: 'pending' | 'accepted' | 'expired' | 'cancelled'
+      invite_type: 'member' | 'household'
       stock_level: 'high' | 'medium' | 'low' | 'out'
       variant_action: 'add' | 'remove' | 'swap'
     }
