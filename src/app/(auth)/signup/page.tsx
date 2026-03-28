@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Info } from 'lucide-react'
 
 export default function SignupPage() {
   const router = useRouter()
@@ -41,6 +41,13 @@ export default function SignupPage() {
   return (
     <div className="card">
       <h2 className="mb-6 text-xl font-semibold text-stone-900 dark:text-dt-primary">Create your account</h2>
+
+      <div className="mb-4 flex items-start gap-2 rounded-lg bg-teal-50 px-3 py-2.5 dark:bg-teal-900/20">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-teal-600 dark:text-teal-400" />
+        <p className="text-sm text-teal-700 dark:text-teal-300">
+          This app is invite-only. Contact your household admin to get started.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
