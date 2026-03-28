@@ -7,7 +7,7 @@ import { logEvent } from '@/lib/events'
 import { Loader2, CheckCircle2, XCircle } from 'lucide-react'
 
 type InviteInfo = {
-  valid: boolean
+  is_valid: boolean
   household_name: string | null
   email: string | null
 }
@@ -35,7 +35,7 @@ export default function JoinPage() {
         p_token: token,
       })
       if (error || !data) {
-        setInvite({ valid: false, household_name: null, email: null })
+        setInvite({ is_valid: false, household_name: null, email: null })
       } else {
         // data could be a single object or array depending on RPC return
         const result = Array.isArray(data) ? data[0] : data
@@ -98,7 +98,7 @@ export default function JoinPage() {
   }
 
   // Invalid / expired token
-  if (!invite?.valid) {
+  if (!invite?.is_valid) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 dark:from-surface dark:via-surface dark:to-surface p-4">
         <div className="w-full max-w-md text-center">

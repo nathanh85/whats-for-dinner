@@ -9,6 +9,7 @@ import { Copy, Check, Mail, Clock, Loader2 } from 'lucide-react'
 type PendingInvite = {
   id: string
   email: string
+  token: string
   created_at: string
   expires_at: string
 }
@@ -103,17 +104,32 @@ export default function InviteSection({
                   <Clock className="h-3.5 w-3.5 text-stone-400 dark:text-dt-muted" />
                   <span className="text-stone-700 dark:text-dt-secondary">{inv.email}</span>
                 </div>
-                <span className="text-xs text-stone-400 dark:text-dt-muted">
+                <div className="flex items-center gap-2">
                   {copiedToken === inv.id ? (
-                    <span className="flex items-center gap-1 text-green-600">
+                    <span className="flex items-center gap-1 text-xs text-green-600">
                       <Check className="h-3.5 w-3.5" /> Copied!
                     </span>
                   ) : (
-                    <span className="text-xs text-stone-400 dark:text-dt-muted">
-                      expires {new Date(inv.expires_at).toLocaleDateString()}
-                    </span>
+                    <>
+                      <span className="text-xs text-stone-400 dark:text-dt-muted">
+                        expires {new Date(inv.expires_at).toLocaleDateString()}
+                      </span>
+                      <button
+                        onClick={async () => {
+                          const url = `${window.location.origin}/join/${inv.token}`
+                          await navigator.clipboard.writeText(url)
+                          setCopiedToken(inv.id)
+                          setTimeout(() => setCopiedToken(null), 3000)
+                        }}
+                        className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:text-dt-muted dark:hover:bg-surface-hover dark:hover:text-dt-secondary"
+                        title="Copy invite link"
+                      >
+                        <Copy className="h-3 w-3" />
+                        Copy link
+                      </button>
+                    </>
                   )}
-                </span>
+                </div>
               </li>
             ))}
           </ul>

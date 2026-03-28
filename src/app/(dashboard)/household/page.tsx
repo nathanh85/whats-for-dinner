@@ -44,7 +44,7 @@ export default async function HouseholdPage() {
   const pendingInvites = household
     ? await supabase
         .from('household_invites')
-        .select('id, email, created_at, expires_at')
+        .select('id, email, token, created_at, expires_at')
         .eq('household_id', household.id)
         .eq('status', 'pending')
         .order('created_at', { ascending: false })
